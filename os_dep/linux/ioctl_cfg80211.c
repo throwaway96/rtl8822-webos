@@ -7388,7 +7388,11 @@ static s32 cfg80211_rtw_remain_on_channel(struct wiphy *wiphy,
 	}
 #endif
 	if (_FAIL == rtw_pwr_wakeup(padapter)) {
+#ifdef LGE_PRIVATE
+		err = -EBUSY;
+#else
 		err = -EFAULT;
+#endif
 		goto exit;
 	}
 
