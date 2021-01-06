@@ -2175,7 +2175,7 @@ int On_TDLS_Setup_Rsp(_adapter *padapter, union recv_frame *precv_frame, struct 
 			txmgmt.status_code = _STATS_SUCCESSFUL_;
 			if (rtw_tdls_is_driver_setup(padapter) == _TRUE) {
 				wpa_tdls_generate_tpk(padapter, ptdls_sta);
-				if (tdls_verify_mic(ptdls_sta->tpk.kck, 2, plinkid_ie, prsnie, ptimeout_ie, pftie) == _FAIL) {
+				if (tdls_verify_mic((u8 *)&ptdls_sta->tpk, 2, plinkid_ie, prsnie, ptimeout_ie, pftie) == _FAIL) {
 					RTW_INFO("[TDLS] %s tdls_verify_mic fail, free_tdls_sta\n", __FUNCTION__);
 					rtw_tdls_teardown_pre_hdl(padapter, ptdls_sta);
 					rtw_tdls_cmd(padapter, ptdls_sta->cmn.mac_addr, TDLS_TEARDOWN_STA_LOCALLY_POST);
@@ -2302,7 +2302,7 @@ int On_TDLS_Setup_Cfm(_adapter *padapter, union recv_frame *precv_frame, struct 
 	if (prx_pkt_attrib->encrypt) {
 		/* Verify mic in FTIE MIC field */
 		if (rtw_tdls_is_driver_setup(padapter) &&
-		    (tdls_verify_mic(ptdls_sta->tpk.kck, 3, plinkid_ie, prsnie, ptimeout_ie, pftie) == _FAIL)) {
+		    (tdls_verify_mic((u8 *)&ptdls_sta->tpk, 3, plinkid_ie, prsnie, ptimeout_ie, pftie) == _FAIL)) {
 			rtw_tdls_teardown_pre_hdl(padapter, ptdls_sta);
 			rtw_tdls_cmd(padapter, ptdls_sta->cmn.mac_addr, TDLS_TEARDOWN_STA_LOCALLY_POST);
 			ret = _FAIL;
@@ -2941,7 +2941,7 @@ void rtw_build_tdls_setup_rsp_ies(_adapter *padapter, struct xmit_frame *pxmitfr
 
 	/* Fill FTIE mic */
 	if (pattrib->encrypt && rtw_tdls_is_driver_setup(padapter) == _TRUE)
-		wpa_tdls_ftie_mic(ptdls_sta->tpk.kck, 2, plinkid_ie, prsnie, ptimeout_ie, pftie, pftie_mic);
+		wpa_tdls_ftie_mic((u8 *)&ptdls_sta->tpk, 2, plinkid_ie, prsnie, ptimeout_ie, pftie, pftie_mic);
 
 	if ((pregistrypriv->wmm_enable == _TRUE) || (padapter->mlmepriv.htpriv.ht_option == _TRUE))
 		pframe = rtw_tdls_set_qos_cap(pframe, pattrib);
@@ -3017,7 +3017,7 @@ void rtw_build_tdls_setup_cfm_ies(_adapter *padapter, struct xmit_frame *pxmitfr
 	pframe = rtw_tdls_set_linkid(padapter, pframe, pattrib, _TRUE);
 
 	if (pattrib->encrypt && (rtw_tdls_is_driver_setup(padapter) == _TRUE))
-		wpa_tdls_ftie_mic(ptdls_sta->tpk.kck, 3, plinkid_ie, prsnie, ptimeout_ie, pftie, pftie_mic);
+		wpa_tdls_ftie_mic((u8 *)&ptdls_sta->tpk, 3, plinkid_ie, prsnie, ptimeout_ie, pftie, pftie_mic);
 
 	if (ptdls_sta->qos_option == _TRUE)
 		pframe = rtw_tdls_set_wmm_params(padapter, pframe, pattrib);
@@ -3062,7 +3062,7 @@ void rtw_build_tdls_teardown_ies(_adapter *padapter, struct xmit_frame *pxmitfra
 		pframe = rtw_tdls_set_linkid(padapter, pframe, pattrib, _TRUE);
 
 	if (pattrib->encrypt && (rtw_tdls_is_driver_setup(padapter) == _TRUE))
-		wpa_tdls_teardown_ftie_mic(ptdls_sta->tpk.kck, plinkid_ie, ptxmgmt->status_code, 1, 4, pftie, pftie_mic);
+		wpa_tdls_teardown_ftie_mic((u8 *)&ptdls_sta->tpk, plinkid_ie, ptxmgmt->status_code, 1, 4, pftie, pftie_mic);
 }
 
 void rtw_build_tdls_dis_req_ies(_adapter *padapter, struct xmit_frame *pxmitframe, u8 *pframe, struct tdls_txmgmt *ptxmgmt)

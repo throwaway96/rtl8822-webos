@@ -291,6 +291,6 @@ void _tdls_generate_tpk(void *sta, const u8 *own_addr, const u8 *bssid)
 
 	_rtw_memcpy(data + 2 * ETH_ALEN, bssid, ETH_ALEN);
 
-	sha256_prf(key_input, SHA256_MAC_LEN, "TDLS PMK", data, sizeof(data), (u8 *)&psta->tpk, sizeof(psta->tpk));
+	sha256_prf(key_input, SHA256_MAC_LEN, "TDLS PMK", data, sizeof(data), (u8 *)&psta->tpk, 32 /*sizeof(psta->tpk)*/);
 }
 #endif /* CONFIG_TDLS */

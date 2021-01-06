@@ -226,9 +226,9 @@ void dump_st_ctl(void *sel, struct st_ctl_t *st_ctl);
 
 #ifdef CONFIG_TDLS
 struct TDLS_PeerKey {
-	u8 kck[32]; /* TPK-KCK */
+	u8 kck[16]; /* TPK-KCK */
 	u8 tk[32]; /* TPK-TK; only CCMP will be used */
-} ;
+};
 #endif /* CONFIG_TDLS */
 
 #ifdef DBG_RX_DFRAME_RAW_DATA
