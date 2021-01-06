@@ -878,7 +878,7 @@ char *rtw_lge_file_path = "/mnt/lg/cmn_data/network/factory_settings";
 module_param(rtw_lge_file_path, charp, 0644);
 MODULE_PARM_DESC(rtw_lge_file_path, "LGE Network Setting");
 
-char _rtw_ext_path1[] = "/lib/firmware/CcodeTable_RT8822_21Y";
+char _rtw_ext_path1[] = "/lib/firmware/CcodeTable_RT8822_20Y";
 
 char *rtw_ext_path1 = _rtw_ext_path1;
 module_param(rtw_ext_path1, charp, 0644);
@@ -3771,19 +3771,24 @@ int _netdev_open(struct net_device *pnetdev)
 
 	if (load_default_table == 1) {
 		if (rtw_is_file_readable(rtw_ext_path1) == _FALSE) {
-			int i, _len, cc = '9';
+			int i, _len, cc = '9', exist = 0;
 
 			_len = strlen(rtw_ext_path1);
 
-			for (i = 0; i<10; i++) {
+			for (i = 0; i < 10; i++) {
 				*(rtw_ext_path1 + _len - 2) = cc--;
-				if (rtw_is_file_readable(rtw_ext_path1) == _TRUE)
+				if (rtw_is_file_readable(rtw_ext_path1) == _TRUE) {
+					exist = 1;
 					break;
+				}
 			}
-			/* will not happen */
-			LGE_MSG("[WLAN] ccode Table is not exist in %s", REALTEK_CONFIG_PATH);
-			LGE_MSG("[WLAN] WIFI_STATUS=fail");
-			goto netdev_open_error;
+
+			if (exist == 0) {
+				/* will not happen */
+				LGE_MSG("[WLAN] ccode Table is not exist in %s", REALTEK_CONFIG_PATH);
+				LGE_MSG("[WLAN] WIFI_STATUS=fail");
+				goto netdev_open_error;
+			}
 		}
 
 		RTW_INFO("%s acquire Settings from file:%s\n", __func__, rtw_ext_path1);
