@@ -2872,7 +2872,7 @@ void rtw_sta_mstatus_disc_rpt(_adapter *adapter, u8 mac_id)
 	} else {
 		RTW_PRINT(FUNC_ADPT_FMT" invalid macid:%u\n"
 			  , FUNC_ADPT_ARG(adapter), mac_id);
-		rtw_warn_on(1);
+		//rtw_warn_on(1);
 	}
 }
 void rtw_sta_mstatus_report(_adapter *adapter)
