@@ -3784,10 +3784,13 @@ int _netdev_open(struct net_device *pnetdev)
 			}
 
 			if (exist == 0) {
-				/* will not happen */
-				LGE_MSG("[WLAN] ccode Table is not exist in %s", REALTEK_CONFIG_PATH);
-				LGE_MSG("[WLAN] WIFI_STATUS=fail");
-				goto netdev_open_error;
+				*(rtw_ext_path1 + _len - 4) = '\0';
+				if (rtw_is_file_readable(rtw_ext_path1) == _FALSE) {
+					/* will not happen */
+					LGE_MSG("[WLAN] ccode Table is not exist in %s", REALTEK_CONFIG_PATH);
+					LGE_MSG("[WLAN] WIFI_STATUS=fail");
+					goto netdev_open_error;
+				}
 			}
 		}
 
