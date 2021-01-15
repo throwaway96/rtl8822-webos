@@ -1032,8 +1032,8 @@ int rtw_android_priv_cmd(struct net_device *net, struct ifreq *ifr, int cmd)
 			   1, 1 : P2P
 			   2, 1 : MCC or SCC
 			*/
-			chk_primary = rtw_mi_check_fwstate(padapter_primary, MI_LINKED);
-			chk_buddy = rtw_mi_buddy_check_fwstate(padapter_primary, MI_LINKED);
+			chk_primary = rtw_mi_check_fwstate(padapter_primary, WIFI_ASOC_STATE);
+			chk_buddy = rtw_mi_buddy_check_fwstate(padapter_primary, WIFI_ASOC_STATE);
 
 			if (chk_buddy == 1) {
 				_adapter *padapter_p2p = GET_ADAPTER(padapter, IFACE_ID2);

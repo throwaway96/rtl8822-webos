@@ -3468,8 +3468,8 @@ static int rtw_driver_status(
 			strcat(pbuf, buf2);
 
 #ifdef CONFIG_CONCURRENT_MODE
-			chk_primary = rtw_mi_check_fwstate(padapter_primary, MI_LINKED);
-			chk_buddy = rtw_mi_buddy_check_fwstate(padapter_primary, MI_LINKED);
+			chk_primary = rtw_mi_check_fwstate(padapter_primary, WIFI_ASOC_STATE);
+			chk_buddy = rtw_mi_buddy_check_fwstate(padapter_primary, WIFI_ASOC_STATE);
 
 			if (chk_buddy == 1) {
 				_adapter *padapter_p2p = GET_ADAPTER(padapter, IFACE_ID2);
