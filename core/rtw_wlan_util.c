@@ -3986,8 +3986,13 @@ void rtw_alloc_macid(_adapter *padapter, struct sta_info *psta)
 			rtw_macid_map_set(&macid_ctl->bmc, i);
 			rtw_iface_bcmc_id_set(padapter, i);
 			rtw_sec_cam_map_set(&cam_ctl->used, i);
-			if (_rtw_camctl_chk_cap(padapter, SEC_CAP_CHK_EXTRA_SEC))
-				rtw_sec_cam_map_set(&cam_ctl->used, i + 1);
+			if (_rtw_camctl_chk_cap(padapter, SEC_CAP_CHK_EXTRA_SEC)) {
+				struct security_priv *psecpriv = &padapter->securitypriv;
+
+				if (!!(psecpriv->dot11PrivacyAlgrthm & _SEC_TYPE_256_)) {
+					rtw_sec_cam_map_set(&cam_ctl->used, i + 1);
+				}
+			}
 		}
 		#endif
 
@@ -4070,8 +4075,13 @@ void rtw_release_macid(_adapter *padapter, struct sta_info *psta)
 
 		if ((id != INVALID_SEC_MAC_CAM_ID) && (id < cam_ctl->num)) {
 			rtw_sec_cam_map_clr(&cam_ctl->used, id);
-			if (_rtw_camctl_chk_cap(padapter, SEC_CAP_CHK_EXTRA_SEC))
-				rtw_sec_cam_map_clr(&cam_ctl->used, id + 1);
+			if (_rtw_camctl_chk_cap(padapter, SEC_CAP_CHK_EXTRA_SEC)) {
+				struct security_priv *psecpriv = &padapter->securitypriv;
+
+				if (!!(psecpriv->dot11PrivacyAlgrthm & _SEC_TYPE_256_)) {
+					rtw_sec_cam_map_clr(&cam_ctl->used, id + 1);
+				}
+			}
 		}
 
 		rtw_iface_bcmc_id_set(padapter, INVALID_SEC_MAC_CAM_ID);
