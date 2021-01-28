@@ -41,10 +41,37 @@ static u8 sethwreg(PADAPTER padapter, u8 variable, u8 *val)
 	struct registry_priv *registry_par = &padapter->registrypriv;
 	int status = 0;
 	u8 ret = _SUCCESS;
+	u8 change = _FALSE;
 
 	switch (variable) {
 	case HW_VAR_RXDMA_AGG_PG_TH:
 #ifdef CONFIG_USB_RX_AGGREGATION
+#ifdef LGE_PRIVATE
+		if (pdvobjpriv->traffic_stat.cur_rx_tp < 40) {
+			/* default 8K */
+			if (pHalData->rxagg_usb_size != 0x01) {
+				pHalData->rxagg_usb_timeout = 0x10;
+				pHalData->rxagg_usb_size = 0x01;
+				change = _TRUE;
+			}
+		} else if (pdvobjpriv->traffic_stat.cur_rx_tp > 80) {
+			if (pHalData->rxagg_usb_timeout != 0x20) {
+				pHalData->rxagg_usb_timeout = 0x20;
+				pHalData->rxagg_usb_size = 0x05;
+				change = _TRUE;
+			}
+		} else if (pdvobjpriv->traffic_stat.cur_rx_tp > 50) {
+			if (!((pHalData->rxagg_usb_timeout == 0x10) &&
+					(pHalData->rxagg_usb_size == 0x05))) {
+				pHalData->rxagg_usb_timeout = 0x10;
+				pHalData->rxagg_usb_size = 0x05;
+				change = _TRUE;
+			}
+		}
+
+		if(change)
+			rtw_halmac_rx_agg_switch(pdvobjpriv, _TRUE);
+#else
 		if (pdvobjpriv->traffic_stat.cur_tx_tp < 1 && pdvobjpriv->traffic_stat.cur_rx_tp < 1) {
 			/* for low traffic, do not usb AGGREGATION */
 			pHalData->rxagg_usb_timeout = 0x01;
@@ -65,6 +92,8 @@ static u8 sethwreg(PADAPTER padapter, u8 variable, u8 *val)
 #endif
 		}
 		rtw_halmac_rx_agg_switch(pdvobjpriv, _TRUE);
+#endif /* LGE_PRIVATE */
+
 #if 0
 		RTW_INFO("\n==========RAFFIC_STATISTIC==============\n");
 		RTW_INFO("cur_tx_bytes:%lld\n", pdvobjpriv->traffic_stat.cur_tx_bytes);

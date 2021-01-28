@@ -438,6 +438,10 @@ void rtl8822cu_interface_configure(PADAPTER padapter)
 #ifdef CONFIG_USB_RX_AGGREGATION
 	/* according to value defined by halmac */
 	pHalData->rxagg_mode = RX_AGG_USB;
+#ifdef LGE_PRIVATE
+	pHalData->rxagg_usb_size = 1;
+	pHalData->rxagg_usb_timeout = 0x10;
+#endif /* LGE_PRIVATE */
 #ifdef CONFIG_PLATFORM_NOVATEK_NT72668
 	pHalData->rxagg_usb_size = 0x03;
 	pHalData->rxagg_usb_timeout = 0x20;
