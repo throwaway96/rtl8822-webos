@@ -485,12 +485,15 @@ void phydm_nhm_get_utility(void *dm_void)
 		ccx->nhm_level_valid = (nhm_rpt_non_11 * 100) >> 8;
 		ccx->nhm_level = phydm_nhm_cal_noise(dm, 0, NHM_RPT_NUM - 2,
 						     nhm_rpt_non_11);
+		ccx->nhm_pwr = phydm_nhm_cal_noise(dm, 0, NHM_RPT_NUM - 1,
+						   ccx->nhm_rpt_sum);
 	} else {
 		PHYDM_DBG(dm, DBG_ENV_MNTR, "[warning] nhm_rpt_sum invalid\n");
 		ccx->nhm_ratio = 0;
 	}
 
-	PHYDM_DBG(dm, DBG_ENV_MNTR, "nhm_ratio=%d\n", ccx->nhm_ratio);
+	PHYDM_DBG(dm, DBG_ENV_MNTR, "nhm_ratio=%d, nhm_level=%d, nhm_pwr=%d\n",
+		  ccx->nhm_ratio, ccx->nhm_level, ccx->nhm_pwr);
 }
 
 boolean
@@ -1779,6 +1782,7 @@ u8 phydm_env_mntr_result(void *dm_void, struct env_mntr_rpt *rpt)
 		phydm_nhm_get_utility(dm);
 		rpt->nhm_ratio = ccx->nhm_ratio;
 		rpt->nhm_noise_pwr = ccx->nhm_level;
+		rpt->nhm_pwr = ccx->nhm_pwr;
 		env_mntr_rpt |= NHM_SUCCESS;
 
 		odm_move_memory(dm, &rpt->nhm_result[0],

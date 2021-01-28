@@ -561,6 +561,7 @@ enum phydm_info_query {
 	PHYDM_INFO_CLM_RATIO,
 	PHYDM_INFO_NHM_RATIO,
 	PHYDM_INFO_NHM_NOISE_PWR,
+	PHYDM_INFO_NHM_PWR,
 };
 
 enum phydm_api {

@@ -144,6 +144,7 @@ struct env_mntr_rpt {
 	u8			nhm_rpt_stamp;
 	u8			clm_rpt_stamp;
 	u8			nhm_noise_pwr;
+	u8			nhm_pwr; /*including r[0]~r[11]*/
 };
 
 struct nhm_para_info {
@@ -186,6 +187,7 @@ struct ccx_info {
 	u8			nhm_rpt_stamp;
 	u8			nhm_level;
 	u8			nhm_level_valid;
+	u8			nhm_pwr; /*including r[0]~r[11]*/
 #ifdef NHM_DYM_PW_TH_SUPPORT
 	boolean			nhm_dym_pw_th_en;
 	boolean			dym_pwth_manual_ctrl;

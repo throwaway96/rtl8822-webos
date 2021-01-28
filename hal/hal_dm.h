@@ -15,6 +15,10 @@
 #ifndef __HAL_DM_H__
 #define __HAL_DM_H__
 
+#ifdef LGE_PRIVATE
+u8 rtw_phydm_get_noise(_adapter *adapter);
+#endif
+
 #define adapter_to_phydm(adapter) (&(GET_HAL_DATA(adapter)->odmpriv))
 #define dvobj_to_phydm(dvobj) adapter_to_phydm(dvobj_get_primary_adapter(dvobj))
 #ifdef CONFIG_TDMADIG

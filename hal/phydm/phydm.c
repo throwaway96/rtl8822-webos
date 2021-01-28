@@ -2882,6 +2882,8 @@ u32 phydm_cmn_info_query(struct dm_struct *dm, enum phydm_info_query info_type)
 		return (u32)ccx_info->nhm_ratio;
 	case PHYDM_INFO_NHM_NOISE_PWR:
 		return (u32)ccx_info->nhm_level;
+	case PHYDM_INFO_NHM_PWR:
+		return (u32)ccx_info->nhm_pwr;
 	default:
 		return 0xffffffff;
 	}

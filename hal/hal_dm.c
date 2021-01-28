@@ -1865,4 +1865,13 @@ void rtw_phydm_watchdog(_adapter *adapter, bool in_lps)
 	return;
 }
 
+#ifdef LGE_PRIVATE
+u8 rtw_phydm_get_noise(_adapter *adapter)
+{
+	struct dm_struct *phydm = adapter_to_phydm(adapter);
+	u8 noise = 0;
 
+	noise = phydm_cmn_info_query(phydm, (enum phydm_info_query) PHYDM_INFO_NHM_PWR);
+	return noise;
+}
+#endif

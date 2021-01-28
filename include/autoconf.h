@@ -202,7 +202,7 @@
 #define CONFIG_NEW_SIGNAL_STAT_PROCESS
 #define CONFIG_SIGNAL_DISPLAY_DBM /*display RX signal with dbm */
 #ifdef CONFIG_SIGNAL_DISPLAY_DBM
-#define CONFIG_BACKGROUND_NOISE_MONITOR
+//#define CONFIG_BACKGROUND_NOISE_MONITOR
 #endif
 #define RTW_NOTCH_FILTER 0 /* 0:Disable, 1:Enable, */
 

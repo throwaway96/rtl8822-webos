@@ -14196,9 +14196,7 @@ void rtw_dump_rx_dframe_info2(_adapter *padapter, void *sel)
 	u8 null_addr[6] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 	s16 current_noise = 0, current_txpwr = 0;
 
-#ifdef CONFIG_BACKGROUND_NOISE_MONITOR
-	current_noise = rtw_noise_measure_curchan(padapter);
-#endif
+	current_noise = rtw_phydm_get_noise(padapter);
 
 	if (precvpriv->store_law_data_flag) {
 
