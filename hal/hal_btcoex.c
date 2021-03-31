@@ -534,6 +534,10 @@ u8 halbtcoutsrc_IsWifiBusy(PADAPTER padapter)
 {
 	if (rtw_mi_check_status(padapter, MI_AP_ASSOC))
 		return _TRUE;
+#ifdef LGE_PRIVATE
+	if (rtw_mi_check_status(padapter, MI_LINKED))
+		return _TRUE;
+#endif
 	if (rtw_mi_busy_traffic_check(padapter))
 		return _TRUE;
 
