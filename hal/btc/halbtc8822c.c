@@ -149,16 +149,16 @@ static const struct btc_tdma_para tdma_nsant_8822c[] = {
 static const struct btc_rf_para rf_para_tx_8822c[] = {
 				{0, 0, FALSE, 7},  /* for normal */
 				{0, 16, FALSE, 7}, /* for WL-CPT */
-				{13, 18, TRUE, 4},
-				{12, 18, TRUE, 4},
+				{13, 15, TRUE, 4},
+				{12, 15, TRUE, 4},
 				{7, 24, TRUE, 4},
 				{6, 28, TRUE, 4} };
 
 static const struct btc_rf_para rf_para_rx_8822c[] = {
 				{0, 0, FALSE, 7},  /* for normal */
 				{0, 16, FALSE, 7}, /* for WL-CPT */
-				{10, 18, TRUE, 5},
-				{10, 18, TRUE, 5},
+				{5, 15, TRUE, 5},
+				{5, 15, TRUE, 5},
 				{4, 16, TRUE, 5},
 				{2, 28, TRUE, 5} };
 
@@ -166,7 +166,7 @@ const struct btc_5g_afh_map afh_5g_8822c[] = { {0, 0, 0} };
 
 const struct btc_chip_para btc_chip_para_8822c = {
 	"8822c",				/*.chip_name */
-	20191120,				/*.para_ver_date */
+	20210312,				/*.para_ver_date */
 	0x15,					/*.para_ver */
 	0x13,					/* bt_desired_ver */
 	TRUE,					/* scbd_support */

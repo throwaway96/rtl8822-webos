@@ -18,7 +18,7 @@
 #if (BT_SUPPORT == 1 && COEX_SUPPORT == 1)
 
 static u8 *trace_buf = &gl_btc_trace_buf[0];
-static const u32 coex_ver_date = 202001221;
+static const u32 coex_ver_date = 202103122;
 static const u32 coex_ver = 0x15;
 static const u32 wl_fw_desired_ver = 0x7000b;
 /*  static const u32 bt_desired_ver = 0x9; */
@@ -253,10 +253,10 @@ rtw_btc_freerun_check(struct btc_coexist *btc)
 		return TRUE;
 
 	/* ant_distance = 5 ~ 40  */
-	if (BTC_RSSI_HIGH(coex_dm->wl_rssi_state[1]) &&
-	    BTC_RSSI_HIGH(coex_dm->bt_rssi_state[0]))
+	if (BTC_RSSI_HIGH(coex_dm->wl_rssi_state[2]) &&
+	    coex_sta->cnt_wl[BTC_CNT_WL_SCANAP] <= 5)
 		return TRUE;
-
+#if 0
 	if (link_info_ext->traffic_dir == BTC_WIFI_TRAFFIC_TX)
 		bt_rssi = coex_dm->bt_rssi_state[0];
 	else
@@ -266,7 +266,7 @@ rtw_btc_freerun_check(struct btc_coexist *btc)
 	    BTC_RSSI_HIGH(bt_rssi) &&
 	    coex_sta->cnt_wl[BTC_CNT_WL_SCANAP] <= 5)
 		return TRUE;
-
+#endif
 	return FALSE;
 }
 
@@ -2510,8 +2510,8 @@ static void rtw_btc_action_bt_a2dp(struct btc_coexist *btc)
 		else
 			tdma_case = 13;
 	} else { /* Non-Shared-Ant */
-		table_case = 121;
-		tdma_case = 113;
+		table_case = 112;
+		tdma_case = 111;
 	}
 
 	rtw_btc_table(btc, NM_EXCU, table_case);
@@ -2947,20 +2947,20 @@ static void rtw_btc_action_wl_connected(struct btc_coexist *btc)
 		break;
 	case BTC_COEX_A2DP:
 		if (rtw_btc_freerun_check(btc))
-			rtw_btc_action_freerun(btc);
+			rtw_btc_action_bt_a2dp(btc);
 		else if (coex_sta->bt_a2dp_sink)
 			rtw_btc_action_bt_a2dpsink(btc);
-		else
-			rtw_btc_action_bt_a2dp(btc);
+		//else
+		//	rtw_btc_action_bt_a2dp(btc);
 		break;
 	case BTC_COEX_PAN:
 		rtw_btc_action_bt_pan(btc);
 		break;
 	case BTC_COEX_A2DP_HID:
 		if (rtw_btc_freerun_check(btc))
-			rtw_btc_action_freerun(btc);
-		else
 			rtw_btc_action_bt_a2dp_hid(btc);
+		//else
+		//	rtw_btc_action_bt_a2dp_hid(btc);
 		break;
 	case BTC_COEX_A2DP_PAN:
 		rtw_btc_action_bt_a2dp_pan(btc);
