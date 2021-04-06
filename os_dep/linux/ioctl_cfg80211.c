@@ -7377,15 +7377,6 @@ static s32 cfg80211_rtw_remain_on_channel(struct wiphy *wiphy,
 		}
 	}
 #endif
-	if (rtw_mi_buddy_check_fwstate(padapter, WIFI_ASOC_STATE)) {
-		u8 op_ch = rtw_get_oper_ch(padapter);
-
-		if ((remain_ch != op_ch) && !(op_ch > 48 && op_ch < 149)) {
-			RTW_INFO(CLR_LT_RED"P2P listen ch is not match AP ch"CLR_NONEN);
-			err = -EBUSY;
-			goto exit;
-		}
-	}
 #endif
 	if (_FAIL == rtw_pwr_wakeup(padapter)) {
 #ifdef LGE_PRIVATE
