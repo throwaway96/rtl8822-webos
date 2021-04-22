@@ -2444,6 +2444,7 @@ u8 rtl8822c_sethwreg(PADAPTER adapter, u8 variable, u8 *val)
 		u8 enable = *val;
 		u8 value = 0;
 		u8 addr = REG_PAD_CTRL1_8822C + 3;
+		u32 val;
 
 		if (WAKEUP_GPIO_IDX == 6) {
 			value = rtw_read8(adapter, addr);
@@ -2457,6 +2458,10 @@ u8 rtl8822c_sethwreg(PADAPTER adapter, u8 variable, u8 *val)
 			RTW_INFO("[HW_SET_GPIO_WL_CTRL] 0x%02X=0x%02X\n",
 				 addr, rtw_read8(adapter, addr));
 		}
+
+		val = rtw_read32(adapter, REG_LED_CFG);
+		rtw_write32(adapter, REG_LED_CFG, val & ~BIT_LED2DIS);
+
 	}
 	break;
 #endif

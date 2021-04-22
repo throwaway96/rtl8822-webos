@@ -5781,6 +5781,22 @@ static u8 rtw_hal_set_disconnect_decision_cmd(_adapter *adapter, u8 enable)
 	return ret;
 }
 
+static u8 rtw_hal_set_wowlan_ext_cmd(_adapter *adapter)
+{
+	struct hal_ops *pHalFunc = &adapter->hal_func;
+	u8 u1H2CWoWlanExtParm[H2C_WOW_EXT_LEN] = {0};
+	u8 ret = _FAIL;
+
+	SET_H2CCMD_WOWLAN_EXT_DEV2HST_SEC_CUSTOM_EN(u1H2CWoWlanExtParm, 1);
+	SET_H2CCMD_WOWLAN_EXT_SEC_CUSTOM_DEV2HST_NUM(u1H2CWoWlanExtParm, 8);
+
+	ret = rtw_hal_fill_h2c_cmd(adapter,
+				H2C_WOWLAN_EXT,
+				H2C_WOW_EXT_LEN,
+				u1H2CWoWlanExtParm);
+	return ret;
+}
+
 static u8 rtw_hal_set_wowlan_ctrl_cmd(_adapter *adapter, u8 enable, u8 change_unit)
 {
 	struct registry_priv  *registry_par = &adapter->registrypriv;
@@ -5902,7 +5918,7 @@ static u8 rtw_hal_set_wowlan_ctrl_cmd(_adapter *adapter, u8 enable, u8 change_un
 	SET_H2CCMD_WOWLAN_HST2DEV_EN(u1H2CWoWlanCtrlParm, 1);
 #endif /* CONFIG_RTW_ONE_PIN_GPIO */
 #endif /* CONFIG_DIS_UPHY */
-
+	SET_H2CCMD_WOWLAN_WWLAN_EXT_EN(u1H2CWoWlanCtrlParm, 1);
 
 	ret = rtw_hal_fill_h2c_cmd(adapter,
 				   H2C_WOWLAN,
@@ -6149,6 +6165,7 @@ void rtw_hal_set_fw_wow_related_cmd(_adapter *padapter, u8 enable)
 
 	RTW_PRINT("+%s()+: enable=%d\n", __func__, enable);
 
+	rtw_hal_set_wowlan_ext_cmd(padapter);
 	rtw_hal_set_wowlan_ctrl_cmd(padapter, enable, _FALSE);
 
 	if (enable) {

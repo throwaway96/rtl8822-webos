@@ -113,6 +113,7 @@ enum h2c_cmd {
 	H2C_P2P_OFFLOAD = 0x8B,
 	H2C_WAR_OFFLOAD = 0x8D,
 	H2C_WAROFLD_RSVDPAGE1 = 0x8E,
+	H2C_WOWLAN_EXT = 0x8F,
 #ifdef CONFIG_FW_HANDLE_TXBCN
 	H2C_FW_BCN_OFFLOAD = 0xBA,
 #endif
@@ -140,6 +141,7 @@ enum h2c_cmd {
 #endif
 #define H2C_KEEP_ALIVE_CTRL_LEN	2
 #define H2C_DISCON_DECISION_LEN		3
+#define H2C_WOW_EXT_LEN		2
 #define H2C_AP_OFFLOAD_LEN		3
 #define H2C_AP_WOW_GPIO_CTRL_LEN	4
 #define H2C_AP_PS_LEN			2
@@ -355,6 +357,10 @@ s32 rtw_hal_set_FwMediaStatusRpt_range_cmd(_adapter *adapter, bool opmode, bool 
 #define SET_H2CCMD_DISCONDECISION_PARM_CHECK_PERIOD(__pH2CCmd, __Value)	SET_BITS_TO_LE_1BYTE(__pH2CCmd+1, 0, 8, __Value)
 #define SET_H2CCMD_DISCONDECISION_PARM_TRY_PKT_NUM(__pH2CCmd, __Value)	SET_BITS_TO_LE_1BYTE(__pH2CCmd+2, 0, 8, __Value)
 #define SET_H2CCMD_DISCONDECISION_PARM_TRY_OK_BCN(__pH2CCmd, __Value)	SET_BITS_TO_LE_1BYTE(__pH2CCmd+3, 0, 8, __Value)
+
+/* _WOWLAN_EXT_CMD_0x8F */
+#define SET_H2CCMD_WOWLAN_EXT_DEV2HST_SEC_CUSTOM_EN(__pH2CCmd, __Value)		SET_BITS_TO_LE_1BYTE(__pH2CCmd+1, 0, 1, __Value)
+#define SET_H2CCMD_WOWLAN_EXT_SEC_CUSTOM_DEV2HST_NUM(__pH2CCmd, __Value)	SET_BITS_TO_LE_1BYTE(__pH2CCmd+1, 1, 7, __Value)
 
 #ifdef CONFIG_RTW_CUSTOMER_STR
 #define RTW_CUSTOMER_STR_LEN 16
@@ -572,6 +578,7 @@ s32 rtw_hal_customer_str_write(_adapter *adapter, const u8 *cs);
 #define SET_H2CCMD_WOWLAN_DEV2HST_EN(__pH2CCmd, __Value) 	SET_BITS_TO_LE_1BYTE((__pH2CCmd)+4, 7, 1, __Value)
 #define SET_H2CCMD_WOWLAN_TIME_FOR_UPHY_DISABLE(__pH2CCmd, __Value) SET_BITS_TO_LE_1BYTE((__pH2CCmd)+5, 0, 8, __Value)
 #define SET_H2CCMD_WOWLAN_RISE_HST2DEV(__pH2CCmd, __Value) 	SET_BITS_TO_LE_1BYTE((__pH2CCmd)+6, 2, 1, __Value)
+#define SET_H2CCMD_WOWLAN_WWLAN_EXT_EN(__pH2CCmd, __Value)		SET_BITS_TO_LE_1BYTE((__pH2CCmd)+6, 7, 1, __Value)
 
 /* _REMOTE_WAKEUP_CMD_0x81 */
 #define SET_H2CCMD_REMOTE_WAKECTRL_ENABLE(__pH2CCmd, __Value)		SET_BITS_TO_LE_1BYTE(__pH2CCmd, 0, 1, __Value)
