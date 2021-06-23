@@ -278,6 +278,7 @@ static struct usb_device_id rtw_usb_id_tbl[] = {
 	{USB_DEVICE_AND_INTERFACE_INFO(USB_VENDER_ID_REALTEK, 0xD82B, 0xff, 0xff, 0xff), .driver_info = RTL8822C}, /* 21D USB Single-fuction, WiFi only*/
 	/*=== Customer ID ===*/
 	{USB_DEVICE_AND_INTERFACE_INFO(0x13b1, 0x0043, 0xff, 0xff, 0xff), .driver_info = RTL8822C}, /* Alpha - Alpha*/
+	{USB_DEVICE_AND_INTERFACE_INFO(0x043E, 0x3111, 0xff, 0xff, 0xff), .driver_info = RTL8822C}, /* LGE */
 #endif /* CONFIG_RTL8822C */
 
 #ifdef CONFIG_RTL8814B
