@@ -1,0 +1,384 @@
+CountryCode: 0
+CountryRegion: NMM/1
+PowerSetting: CE
+Flags:[ AC ]
+2.4GHz_1: [11] [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] [20] []
+2.4GHz_2: [2] [12, 13] [20] []
+2.4GHz_3: [0] [] [20] []
+5GHz_Band1: [0] [] [80] []
+5GHz_Band2: [0] [] [80] [PASSIVE_SCAN]
+5GHz_Band3: [0] [] [80] [PASSIVE_SCAN]
+5GHz_Band4: [0] [] [80] []
+
+CountryCode: 1
+CountryRegion: NPK/1
+PowerSetting: CE
+Flags:[ AC ]
+2.4GHz_1: [11] [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] [20] []
+2.4GHz_2: [2] [12, 13] [20] []
+2.4GHz_3: [0] [] [20] []
+5GHz_Band1: [0] [] [80] []
+5GHz_Band2: [0] [] [80] [PASSIVE_SCAN]
+5GHz_Band3: [0] [] [80] [PASSIVE_SCAN]
+5GHz_Band4: [5] [149, 153, 157, 161, 165] [80] []
+
+CountryCode: 10
+CountryRegion: NKR/1
+PowerSetting: KCC
+Flags:[ AC ]
+2.4GHz_1: [11] [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] [20] []
+2.4GHz_2: [2] [12, 13] [20] []
+2.4GHz_3: [0] [] [20] []
+5GHz_Band1: [4] [36, 40, 44, 48] [80] []
+5GHz_Band2: [4] [52, 56, 60, 64] [80] [PASSIVE_SCAN]
+5GHz_Band3: [11] [100, 104, 108, 112, 116, 120, 124, 128, 132, 136, 140] [80] [PASSIVE_SCAN]
+5GHz_Band4: [5] [149, 153, 157, 161, 165] [80] []
+
+CountryCode: 11
+CountryRegion: NJP/1
+PowerSetting: TELEC
+Flags:[ AC ]
+2.4GHz_1: [11] [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] [20] []
+2.4GHz_2: [2] [12, 13] [20] []
+2.4GHz_3: [1] [14] [20] []
+5GHz_Band1: [4] [36, 40, 44, 48] [80] []
+5GHz_Band2: [4] [52, 56, 60, 64] [80] [PASSIVE_SCAN]
+5GHz_Band3: [11] [100, 104, 108, 112, 116, 120, 124, 128, 132, 136, 140] [80] [PASSIVE_SCAN]
+5GHz_Band4: [0] [] [80] []
+
+CountryCode: 12
+CountryRegion: NEU/1
+PowerSetting: CE
+Flags:[ AC ]
+2.4GHz_1: [11] [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] [20] []
+2.4GHz_2: [2] [12, 13] [20] []
+2.4GHz_3: [0] [] [20] []
+5GHz_Band1: [4] [36, 40, 44, 48] [80] []
+5GHz_Band2: [4] [52, 56, 60, 64] [80] [PASSIVE_SCAN]
+5GHz_Band3: [11] [100, 104, 108, 112, 116, 120, 124, 128, 132, 136, 140] [80] [PASSIVE_SCAN]
+5GHz_Band4: [5] [149, 153, 157, 161, 165] [80] []
+
+CountryCode: 13
+CountryRegion: NMR/1
+PowerSetting: CE
+Flags:[ AC ]
+2.4GHz_1: [11] [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] [20] []
+2.4GHz_2: [2] [12, 13] [20] []
+2.4GHz_3: [0] [] [20] []
+5GHz_Band1: [4] [36, 40, 44, 48] [80] []
+5GHz_Band2: [4] [52, 56, 60, 64] [80] [PASSIVE_SCAN]
+5GHz_Band3: [0] [] [80] [PASSIVE_SCAN]
+5GHz_Band4: [0] [] [80] []
+
+CountryCode: 14
+CountryRegion: NHK/1
+PowerSetting: CE
+Flags:[ AC ]
+2.4GHz_1: [11] [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] [20] []
+2.4GHz_2: [2] [12, 13] [20] []
+2.4GHz_3: [0] [] [20] []
+5GHz_Band1: [4] [36, 40, 44, 48] [80] []
+5GHz_Band2: [0] [] [80] [PASSIVE_SCAN]
+5GHz_Band3: [0] [] [80] [PASSIVE_SCAN]
+5GHz_Band4: [5] [149, 153, 157, 161, 165] [80] []
+
+CountryCode: 15
+CountryRegion: NMX/1
+PowerSetting: FCC
+Flags:[ AC ]
+2.4GHz_1: [11] [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] [20] []
+2.4GHz_2: [2] [12, 13] [20] []
+2.4GHz_3: [0] [] [20] []
+5GHz_Band1: [4] [36, 40, 44, 48] [80] []
+5GHz_Band2: [4] [52, 56, 60, 64] [80] [PASSIVE_SCAN]
+5GHz_Band3: [8] [100, 104, 108, 112, 116, 132, 136, 140] [80] [PASSIVE_SCAN]
+5GHz_Band4: [5] [149, 153, 157, 161, 165] [80] []
+
+CountryCode: 16
+CountryRegion: NKZ/1
+PowerSetting: CE
+Flags:[ AC ]
+2.4GHz_1: [11] [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] [20] []
+2.4GHz_2: [2] [12, 13] [20] []
+2.4GHz_3: [0] [] [20] []
+5GHz_Band1: [4] [36, 40, 44, 48] [80] []
+5GHz_Band2: [4] [52, 56, 60, 64] [80] [PASSIVE_SCAN]
+5GHz_Band3: [0] [] [80] [PASSIVE_SCAN]
+5GHz_Band4: [0] [] [80] []
+
+CountryCode: 17
+CountryRegion: NAU/1
+PowerSetting: CE
+Flags:[ AC ]
+2.4GHz_1: [11] [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] [20] []
+2.4GHz_2: [2] [12, 13] [20] []
+2.4GHz_3: [0] [] [20] []
+5GHz_Band1: [4] [36, 40, 44, 48] [80] []
+5GHz_Band2: [4] [52, 56, 60, 64] [80] [PASSIVE_SCAN]
+5GHz_Band3: [9] [100, 104, 108, 112, 116, 132, 136, 140, 144] [80] [PASSIVE_SCAN]
+5GHz_Band4: [5] [149, 153, 157, 161, 165] [80] []
+
+CountryCode: 18
+CountryRegion: NCL/1
+PowerSetting: FCC
+Flags:[ AC ]
+2.4GHz_1: [11] [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] [20] []
+2.4GHz_2: [2] [12, 13] [20] []
+2.4GHz_3: [0] [] [20] []
+5GHz_Band1: [4] [36, 40, 44, 48] [80] []
+5GHz_Band2: [4] [52, 56, 60, 64] [80] [PASSIVE_SCAN]
+5GHz_Band3: [0] [] [80] [PASSIVE_SCAN]
+5GHz_Band4: [5] [149, 153, 157, 161, 165] [80] []
+
+CountryCode: 19
+CountryRegion: NNZ/1
+PowerSetting: CE2
+Flags:[ AC ]
+2.4GHz_1: [11] [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] [20] []
+2.4GHz_2: [2] [12, 13] [20] []
+2.4GHz_3: [0] [] [20] []
+5GHz_Band1: [4] [36, 40, 44, 48] [80] []
+5GHz_Band2: [4] [52, 56, 60, 64] [80] [PASSIVE_SCAN]
+5GHz_Band3: [12] [100, 104, 108, 112, 116, 120, 124, 128, 132, 136, 140, 144] [80] [PASSIVE_SCAN]
+5GHz_Band4: [5] [149, 153, 157, 161, 165] [80] []
+
+CountryCode: 31
+CountryRegion: NUE/1
+PowerSetting: CE2
+Flags:[ AC ]
+2.4GHz_1: [11] [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] [20] []
+2.4GHz_2: [2] [12, 13] [20] []
+2.4GHz_3: [0] [] [20] []
+5GHz_Band1: [4] [36, 40, 44, 48] [80] []
+5GHz_Band2: [4] [52, 56, 60, 64] [80] [PASSIVE_SCAN]
+5GHz_Band3: [12] [100, 104, 108, 112, 116, 120, 124, 128, 132, 136, 140, 144] [80] [PASSIVE_SCAN]
+5GHz_Band4: [5] [149, 153, 157, 161, 165] [80] []
+
+CountryCode: 2
+CountryRegion: NSA/1
+PowerSetting: CE
+Flags:[ AC ]
+2.4GHz_1: [11] [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] [20] []
+2.4GHz_2: [2] [12, 13] [20] []
+2.4GHz_3: [0] [] [20] []
+5GHz_Band1: [4] [36, 40, 44, 48] [80] []
+5GHz_Band2: [4] [52, 56, 60, 64] [80] [PASSIVE_SCAN]
+5GHz_Band3: [11] [100, 104, 108, 112, 116, 120, 124, 128, 132, 136, 140] [80] [PASSIVE_SCAN]
+5GHz_Band4: [0] [] [80] []
+
+CountryCode: 20
+CountryRegion: NMY/1
+PowerSetting: CE
+Flags:[ AC ]
+2.4GHz_1: [11] [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] [20] []
+2.4GHz_2: [2] [12, 13] [20] []
+2.4GHz_3: [0] [] [20] []
+5GHz_Band1: [4] [36, 40, 44, 48] [80] []
+5GHz_Band2: [4] [52, 56, 60, 64] [80] [PASSIVE_SCAN]
+5GHz_Band3: [8] [100, 104, 108, 112, 116, 120, 124, 128] [80] [PASSIVE_SCAN]
+5GHz_Band4: [5] [149, 153, 157, 161, 165] [80] []
+
+CountryCode: 21
+CountryRegion: NEG/2
+PowerSetting: CE
+Flags:[ AC ]
+2.4GHz_1: [11] [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] [20] []
+2.4GHz_2: [2] [12, 13] [20] []
+2.4GHz_3: [0] [] [20] []
+5GHz_Band1: [4] [36, 40, 44, 48] [80] []
+5GHz_Band2: [4] [52, 56, 60, 64] [80] [PASSIVE_SCAN]
+5GHz_Band3: [0] [] [80] [PASSIVE_SCAN]
+5GHz_Band4: [0] [] [80] []
+
+CountryCode: 22
+CountryRegion: NRU/1
+PowerSetting: CE
+Flags:[ AC ]
+2.4GHz_1: [11] [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] [20] []
+2.4GHz_2: [2] [12, 13] [20] []
+2.4GHz_3: [0] [] [20] []
+5GHz_Band1: [4] [36, 40, 44, 48] [80] []
+5GHz_Band2: [4] [52, 56, 60, 64] [80] [PASSIVE_SCAN]
+5GHz_Band3: [4] [132, 136, 140, 144] [80] [PASSIVE_SCAN]
+5GHz_Band4: [5] [149, 153, 157, 161, 165] [80] []
+
+CountryCode: 23
+CountryRegion: NUZ/1
+PowerSetting: CE
+Flags:[ AC ]
+2.4GHz_1: [11] [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] [20] []
+2.4GHz_2: [2] [12, 13] [20] []
+2.4GHz_3: [0] [] [20] []
+5GHz_Band1: [4] [36, 40, 44, 48] [80] []
+5GHz_Band2: [0] [] [80] [PASSIVE_SCAN]
+5GHz_Band3: [0] [] [80] [PASSIVE_SCAN]
+5GHz_Band4: [0] [] [80] []
+
+CountryCode: 24
+CountryRegion: NHN/1
+PowerSetting: FCC
+Flags:[ AC ]
+2.4GHz_1: [11] [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] [20] []
+2.4GHz_2: [0] [] [20] []
+2.4GHz_3: [0] [] [20] []
+5GHz_Band1: [0] [] [80] []
+5GHz_Band2: [0] [] [80] [PASSIVE_SCAN]
+5GHz_Band3: [0] [] [80] [PASSIVE_SCAN]
+5GHz_Band4: [5] [149, 153, 157, 161, 165] [80] []
+
+CountryCode: 25
+CountryRegion: NIR/1
+PowerSetting: CE
+Flags:[ AC ]
+2.4GHz_1: [11] [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] [20] []
+2.4GHz_2: [0] [] [20] []
+2.4GHz_3: [0] [] [20] []
+5GHz_Band1: [0] [] [80] []
+5GHz_Band2: [0] [] [80] [PASSIVE_SCAN]
+5GHz_Band3: [0] [] [80] [PASSIVE_SCAN]
+5GHz_Band4: [4] [149, 153, 157, 161] [80] []
+
+CountryCode: 26
+CountryRegion: NBO/1
+PowerSetting: FCC
+Flags:[ AC ]
+2.4GHz_1: [11] [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] [20] []
+2.4GHz_2: [2] [12, 13] [20] []
+2.4GHz_3: [0] [] [20] []
+5GHz_Band1: [0] [] [80] []
+5GHz_Band2: [4] [52, 56, 60, 64] [80] [PASSIVE_SCAN]
+5GHz_Band3: [0] [] [80] [PASSIVE_SCAN]
+5GHz_Band4: [5] [149, 153, 157, 161, 165] [80] []
+
+CountryCode: 27
+CountryRegion: NID/1
+PowerSetting: CE
+Flags:[ AC ]
+2.4GHz_1: [11] [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] [20] []
+2.4GHz_2: [2] [12, 13] [20] []
+2.4GHz_3: [0] [] [20] []
+5GHz_Band1: [4] [36, 40, 44, 48] [80] []
+5GHz_Band2: [4] [52, 56, 60, 64] [80] [PASSIVE_SCAN]
+5GHz_Band3: [0] [] [80] [PASSIVE_SCAN]
+5GHz_Band4: [4] [149, 153, 157, 161] [80] []
+
+CountryCode: 28
+CountryRegion: NCU/1
+PowerSetting: FCC
+Flags:[ AC ]
+2.4GHz_1: [11] [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] [20] []
+2.4GHz_2: [2] [12, 13] [20] []
+2.4GHz_3: [0] [] [20] []
+5GHz_Band1: [0] [] [80] []
+5GHz_Band2: [0] [] [80] [PASSIVE_SCAN]
+5GHz_Band3: [0] [] [80] [PASSIVE_SCAN]
+5GHz_Band4: [5] [149, 153, 157, 161, 165] [80] []
+
+CountryCode: 29
+CountryRegion: NAG/1
+PowerSetting: FCC
+Flags:[ AC ]
+2.4GHz_1: [11] [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] [20] []
+2.4GHz_2: [2] [12, 13] [20] []
+2.4GHz_3: [0] [] [20] []
+5GHz_Band1: [4] [36, 40, 44, 48] [80] []
+5GHz_Band2: [4] [52, 56, 60, 64] [80] [PASSIVE_SCAN]
+5GHz_Band3: [8] [100, 104, 108, 112, 116, 132, 136, 140] [80] [PASSIVE_SCAN]
+5GHz_Band4: [5] [149, 153, 157, 161, 165] [80] []
+
+CountryCode: 3
+CountryRegion: NCH/1
+PowerSetting: CE
+Flags:[ AC ]
+2.4GHz_1: [11] [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] [20] []
+2.4GHz_2: [2] [12, 13] [20] []
+2.4GHz_3: [0] [] [20] []
+5GHz_Band1: [4] [36, 40, 44, 48] [80] []
+5GHz_Band2: [4] [52, 56, 60, 64] [80] [PASSIVE_SCAN]
+5GHz_Band3: [0] [] [80] [PASSIVE_SCAN]
+5GHz_Band4: [5] [149, 153, 157, 161, 165] [80] []
+
+CountryCode: 4
+CountryRegion: NSU/1
+PowerSetting: CE
+Flags:[ AC ]
+2.4GHz_1: [11] [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] [20] []
+2.4GHz_2: [2] [12, 13] [20] []
+2.4GHz_3: [0] [] [20] []
+5GHz_Band1: [4] [36, 40, 44, 48] [80] []
+5GHz_Band2: [4] [52, 56, 60, 64] [80] [PASSIVE_SCAN]
+5GHz_Band3: [12] [100, 104, 108, 112, 116, 120, 124, 128, 132, 136, 140, 144] [80] [PASSIVE_SCAN]
+5GHz_Band4: [4] [149, 153, 157, 161] [80] []
+
+CountryCode: 5
+CountryRegion: NEC/1
+PowerSetting: FCC
+Flags:[ AC ]
+2.4GHz_1: [11] [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] [20] []
+2.4GHz_2: [2] [12, 13] [20] []
+2.4GHz_3: [0] [] [20] []
+5GHz_Band1: [4] [36, 40, 44, 48] [80] []
+5GHz_Band2: [0] [] [80] [PASSIVE_SCAN]
+5GHz_Band3: [0] [] [80] [PASSIVE_SCAN]
+5GHz_Band4: [5] [149, 153, 157, 161, 165] [80] []
+
+CountryCode: 6
+CountryRegion: NIA/1
+PowerSetting: CE
+Flags:[ AC ]
+2.4GHz_1: [11] [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] [20] []
+2.4GHz_2: [2] [12, 13] [20] []
+2.4GHz_3: [0] [] [20] []
+5GHz_Band1: [4] [36, 40, 44, 48] [80] []
+5GHz_Band2: [4] [52, 56, 60, 64] [80] [PASSIVE_SCAN]
+5GHz_Band3: [0] [] [80] [PASSIVE_SCAN]
+5GHz_Band4: [5] [149, 153, 157, 161, 165] [80] []
+
+CountryCode: 7
+CountryRegion: NPR/1
+PowerSetting: FCC
+Flags:[ AC ]
+2.4GHz_1: [11] [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] [20] []
+2.4GHz_2: [2] [12, 13] [20] []
+2.4GHz_3: [0] [] [20] []
+5GHz_Band1: [4] [36, 40, 44, 48] [80] []
+5GHz_Band2: [4] [52, 56, 60, 64] [80] [PASSIVE_SCAN]
+5GHz_Band3: [12] [100, 104, 108, 112, 116, 120, 124, 128, 132, 136, 140, 144] [80] [PASSIVE_SCAN]
+5GHz_Band4: [5] [149, 153, 157, 161, 165] [80] []
+
+CountryCode: 30
+CountryRegion: NBZ/1
+PowerSetting: FCC
+Flags:[ AC ]
+2.4GHz_1: [11] [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] [20] []
+2.4GHz_2: [2] [12, 13] [20] []
+2.4GHz_3: [0] [] [20] []
+5GHz_Band1: [4] [36, 40, 44, 48] [80] []
+5GHz_Band2: [4] [52, 56, 60, 64] [80] [PASSIVE_SCAN]
+5GHz_Band3: [12] [100, 104, 108, 112, 116, 120, 124, 128, 132, 136, 140, 144] [80] [PASSIVE_SCAN]
+5GHz_Band4: [5] [149, 153, 157, 161, 165] [80] []
+
+CountryCode: 8
+CountryRegion: NUS/1
+PowerSetting: FCC
+Flags:[ AC ]
+2.4GHz_1: [11] [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] [20] []
+2.4GHz_2: [0] [] [20] []
+2.4GHz_3: [0] [] [20] []
+5GHz_Band1: [4] [36, 40, 44, 48] [80] []
+5GHz_Band2: [4] [52, 56, 60, 64] [80] [PASSIVE_SCAN]
+5GHz_Band3: [12] [100, 104, 108, 112, 116, 120, 124, 128, 132, 136, 140, 144] [80] [PASSIVE_SCAN]
+5GHz_Band4: [5] [149, 153, 157, 161, 165] [80] []
+
+CountryCode: 9
+CountryRegion: NTW/1
+PowerSetting: FCC
+Flags:[ AC ]
+2.4GHz_1: [11] [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] [20] []
+2.4GHz_2: [0] [] [20] []
+2.4GHz_3: [0] [] [20] []
+5GHz_Band1: [4] [36, 40, 44, 48] [80] []
+5GHz_Band2: [4] [52, 56, 60, 64] [80] [PASSIVE_SCAN]
+5GHz_Band3: [9] [100, 104, 108, 112, 116, 132, 136, 140, 144] [80] [PASSIVE_SCAN]
+5GHz_Band4: [5] [149, 153, 157, 161, 165] [80] []
+
