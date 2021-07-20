@@ -1760,6 +1760,11 @@ void rtw_free_assoc_resources(_adapter *adapter, u8 lock_scanned_queue)
 		if (pwlan) {
 			pwlan->fixed = _FALSE;
 
+#ifdef LGE_PRIVATE
+			if (adapter_wdev_data(adapter)->delay_disconnect == _TRUE) {
+				adapter_wdev_data(adapter)->delay_disconnect_scan_ch = tgt_network->network.Configuration.DSConfig;
+			}
+#endif
 			RTW_INFO("skip free disconnecting network of scanned_queue\n");
 			rtw_free_network_nolock(adapter, pwlan, _FALSE);
 #ifdef CONFIG_P2P
