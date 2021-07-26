@@ -1014,6 +1014,7 @@ static void construct_mic_header1(
 	u8 *mpdu,
 	uint frtype);/* add for CONFIG_IEEE80211W, none 11w also can use */
 static void construct_mic_header2(
+	_adapter *padapter,
 	u8 *mic_header2,
 	u8 *mpdu,
 	sint a4_exists,
@@ -1293,6 +1294,7 @@ static void construct_mic_header1(
 /* header fields.                              */
 /************************************************/
 static void construct_mic_header2(
+	_adapter *padapter,
 	u8 *mic_header2,
 	u8 *mpdu,
 	sint a4_exists,
@@ -1322,16 +1324,26 @@ static void construct_mic_header2(
 	}
 
 	if (qc_exists && !a4_exists) {
-		mic_header2[8] = mpdu[24] & 0x0f; /* mute bits 15 - 4 */
-		mic_header2[9] = mpdu[25] & 0x00;
+		if (padapter->registrypriv.amsdu_mode == RTW_AMSDU_MODE_SPP) {
+			mic_header2[8] = mpdu[24] & 0x8f; /* QC & 0x8F */
+			mic_header2[9] = mpdu[25] & 0x00;
+		} else {
+			mic_header2[8] = mpdu[24] & 0x0f; /* mute bits 15 - 4 */
+			mic_header2[9] = mpdu[25] & 0x00;
+		}
 	}
 
 	if (qc_exists && a4_exists) {
 		for (i = 0; i < 6; i++)
 			mic_header2[8 + i] = mpdu[24 + i]; /* A4 */
 
-		mic_header2[14] = mpdu[30] & 0x0f;
-		mic_header2[15] = mpdu[31] & 0x00;
+		if (padapter->registrypriv.amsdu_mode == RTW_AMSDU_MODE_SPP) {
+			mic_header2[14] = mpdu[24] & 0x8f; /* QC & 0x8F */
+			mic_header2[15] = mpdu[25] & 0x00;
+		} else {
+			mic_header2[14] = mpdu[24] & 0x0f; /* mute bits 15 - 4 */
+			mic_header2[15] = mpdu[25] & 0x00;
+		}
 	}
 
 }
@@ -1395,7 +1407,7 @@ static void bitwise_xor(u8 *ina, u8 *inb, u8 *out)
 }
 
 
-static sint aes_cipher(u8 *key, uint	hdrlen,
+static sint aes_cipher(_adapter *padapter, u8 *key, uint	hdrlen,
 		       u8 *pframe, uint plen)
 {
 	/*	static unsigned char	message[MAX_MSG_SIZE]; */
@@ -1477,6 +1489,7 @@ static sint aes_cipher(u8 *key, uint	hdrlen,
 		frtype /* add for CONFIG_IEEE80211W, none 11w also can use */
 	);
 	construct_mic_header2(
+		padapter,
 		mic_header2,
 		pframe,	/* message, */
 		a4_exists,
@@ -1752,11 +1765,11 @@ u32	rtw_aes_encrypt(_adapter *padapter, u8 *pxmitframe)
 				if ((curfragnum + 1) == pattrib->nr_frags) {	/* 4 the last fragment */
 					length = pattrib->last_txcmdsz - pattrib->hdrlen - pattrib->iv_len - pattrib->icv_len;
 
-					aes_cipher(prwskey, pattrib->hdrlen, pframe, length);
+					aes_cipher(padapter, prwskey, pattrib->hdrlen, pframe, length);
 				} else {
 					length = pxmitpriv->frag_len - pattrib->hdrlen - pattrib->iv_len - pattrib->icv_len ;
 
-					aes_cipher(prwskey, pattrib->hdrlen, pframe, length);
+					aes_cipher(padapter, prwskey, pattrib->hdrlen, pframe, length);
 					pframe += pxmitpriv->frag_len;
 					pframe = (u8 *)RND4((SIZE_PTR)(pframe));
 
@@ -1780,7 +1793,7 @@ u32	rtw_aes_encrypt(_adapter *padapter, u8 *pxmitframe)
 #endif
 
 #if (NEW_CRYPTO == 0)
-static sint aes_decipher(u8 *key, uint	hdrlen,
+static sint aes_decipher(_adapter *padapter, u8 *key, uint	hdrlen,
 			 u8 *pframe, uint plen)
 {
 	static u8	message[MAX_MSG_SIZE];
@@ -1927,6 +1940,7 @@ static sint aes_decipher(u8 *key, uint	hdrlen,
 		frtype /* add for CONFIG_IEEE80211W, none 11w also can use */
 	);
 	construct_mic_header2(
+		padapter,
 		mic_header2,
 		message,
 		a4_exists,
@@ -2244,7 +2258,7 @@ u32	rtw_aes_decrypt(_adapter *padapter, u8 *precvframe)
 			}
 #endif
 
-			res = aes_decipher(prwskey, prxattrib->hdrlen, pframe, length);
+			res = aes_decipher(padapter, prwskey, prxattrib->hdrlen, pframe, length);
 
 			AES_SW_DEC_CNT_INC(psecuritypriv, prxattrib->ra);
 		} else {

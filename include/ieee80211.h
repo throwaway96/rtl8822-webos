@@ -72,6 +72,7 @@ enum {
 #define WLAN_STA_WPS BIT(12)
 #define WLAN_STA_MAYBE_WPS BIT(13)
 #define WLAN_STA_VHT BIT(14)
+#define WLAN_STA_AMSDU_DISABLE BIT(17)
 #define WLAN_STA_NONERP BIT(31)
 
 #endif
@@ -499,12 +500,21 @@ struct rtw_ieee80211s_hdr {
 } __attribute__((packed));
 #endif
 
+/* Some IEEE 802.11x packet types are corresponding to parsing_eapol_packet() */
 enum eap_type {
 	EAP_PACKET = 0,
+	NON_EAPOL,
 	EAPOL_START,
 	EAPOL_LOGOFF,
 	EAPOL_KEY,
-	EAPOL_ENCAP_ASF_ALERT
+	EAPOL_ENCAP_ASF_ALERT,
+	EAPOL_PACKET,
+	EAPOL_WPA_GROUP_KEY_1_2,
+	EAPOL_WPA_GROUP_KEY_2_2,
+	EAPOL_1_4,
+	EAPOL_2_4,
+	EAPOL_3_4,
+	EAPOL_4_4,
 };
 
 #define IEEE80211_3ADDR_LEN 24
@@ -1934,6 +1944,18 @@ void rtw_set_supported_rate(u8 *SupportedRates, uint mode) ;
 #define MFP_OPTIONAL	2
 #define MFP_REQUIRED	3
 
+/*For amsdu mode */
+#define GET_RSN_CAP_SPP_OPT(cap)	LE_BITS_TO_2BYTE(((u8 *)(cap)), 10, 2)
+#define SET_RSN_CAP_SPP(cap, spp)	SET_BITS_TO_LE_2BYTE(((u8 *)(cap)), 10, 2, spp)
+#define SPP_CAP BIT(0)
+#define SPP_REQ BIT(1)
+
+enum rtw_amsdu_mode {
+	RTW_AMSDU_MODE_NON_SPP	= 0,
+	RTW_AMSDU_MODE_SPP	= 1,
+	RTW_AMSDU_MODE_ALL_DROP	= 2,
+};
+
 struct rsne_info {
 	u8 *gcs;
 	u16 pcs_cnt;
@@ -1955,7 +1977,7 @@ int rtw_get_wpa_cipher_suite(u8 *s);
 int rtw_get_rsn_cipher_suite(u8 *s);
 int rtw_get_wapi_ie(u8 *in_ie, uint in_len, u8 *wapi_ie, u16 *wapi_len);
 int rtw_parse_wpa_ie(u8 *wpa_ie, int wpa_ie_len, int *group_cipher, int *pairwise_cipher, u32 *akm);
-int rtw_parse_wpa2_ie(u8 *wpa_ie, int wpa_ie_len, int *group_cipher, int *pairwise_cipher, int *gmcs, u32 *akm, u8 *mfp_opt);
+int rtw_parse_wpa2_ie(u8 *wpa_ie, int wpa_ie_len, int *group_cipher, int *pairwise_cipher, int *gmcs, u32 *akm, u8 *mfp_opt, u8 *spp_opt);
 
 int rtw_get_sec_ie(u8 *in_ie, uint in_len, u8 *rsn_ie, u16 *rsn_len, u8 *wpa_ie, u16 *wpa_len);
 
@@ -2050,5 +2072,8 @@ void macstr2num(u8 *dst, u8 *src);
 u8 convert_ip_addr(u8 hch, u8 mch, u8 lch);
 int wifirate2_ratetbl_inx(unsigned char rate);
 
+/* For amsdu mode. */
+/* void rtw_set_spp_amsdu_mode(u8 mode, u8 *rsn_ie, int rsn_ie_len); */
+u8 rtw_check_amsdu_disable(u8 mode, u8 spp_opt);
 
 #endif /* IEEE80211_H */
