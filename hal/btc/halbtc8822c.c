@@ -22,7 +22,7 @@ static u8 *trace_buf = &gl_btc_trace_buf[0];
 static const u32 bt_desired_ver_8822c = 0x13;
 
 /* rssi express in percentage % (dbm = % - 100)  */
-static const u8 wl_rssi_step_8822c[] = {60, 50, 44, 30};
+static const u8 wl_rssi_step_8822c[] = {56, 48, 42, 35};
 static const u8 bt_rssi_step_8822c[] = {8, 15, 20, 25};
 
 /* Shared-Antenna Coex Table */

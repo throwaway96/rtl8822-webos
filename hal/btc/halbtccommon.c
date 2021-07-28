@@ -18,7 +18,7 @@
 #if (BT_SUPPORT == 1 && COEX_SUPPORT == 1)
 
 static u8 *trace_buf = &gl_btc_trace_buf[0];
-static const u32 coex_ver_date = 202103122;
+static const u32 coex_ver_date = 202107231;
 static const u32 coex_ver = 0x15;
 static const u32 wl_fw_desired_ver = 0x7000b;
 /*  static const u32 bt_desired_ver = 0x9; */
@@ -244,8 +244,7 @@ rtw_btc_freerun_check(struct btc_coexist *btc)
 	if (coex_sta->bt_disabled)
 		return FALSE;
 
-	if (btc->board_info.btdm_ant_num == 1 ||
-	    btc->board_info.ant_distance <= 5 || !coex_sta->wl_gl_busy)
+	if (btc->board_info.btdm_ant_num == 1 || !coex_sta->wl_gl_busy)
 		return FALSE;
 
 	if (btc->board_info.ant_distance >= 40 ||
@@ -254,7 +253,8 @@ rtw_btc_freerun_check(struct btc_coexist *btc)
 
 	/* ant_distance = 5 ~ 40  */
 	if (BTC_RSSI_HIGH(coex_dm->wl_rssi_state[2]) &&
-	    coex_sta->cnt_wl[BTC_CNT_WL_SCANAP] <= 5)
+	    BTC_RSSI_HIGH(coex_dm->wl_rssi_state[1]) &&
+	    coex_sta->cnt_wl[BTC_CNT_WL_SCANAP] <= 10)
 		return TRUE;
 #if 0
 	if (link_info_ext->traffic_dir == BTC_WIFI_TRAFFIC_TX)
@@ -2947,20 +2947,20 @@ static void rtw_btc_action_wl_connected(struct btc_coexist *btc)
 		break;
 	case BTC_COEX_A2DP:
 		if (rtw_btc_freerun_check(btc))
-			rtw_btc_action_bt_a2dp(btc);
+			rtw_btc_action_freerun(btc);
 		else if (coex_sta->bt_a2dp_sink)
 			rtw_btc_action_bt_a2dpsink(btc);
-		//else
-		//	rtw_btc_action_bt_a2dp(btc);
+		else
+			rtw_btc_action_bt_a2dp(btc);
 		break;
 	case BTC_COEX_PAN:
 		rtw_btc_action_bt_pan(btc);
 		break;
 	case BTC_COEX_A2DP_HID:
 		if (rtw_btc_freerun_check(btc))
+			rtw_btc_action_freerun(btc);
+		else
 			rtw_btc_action_bt_a2dp_hid(btc);
-		//else
-		//	rtw_btc_action_bt_a2dp_hid(btc);
 		break;
 	case BTC_COEX_A2DP_PAN:
 		rtw_btc_action_bt_a2dp_pan(btc);
