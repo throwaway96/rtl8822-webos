@@ -5923,6 +5923,7 @@ int rtw_resume_common(_adapter *padapter)
 	adapter_wdev_data(padapter)->wowl_activate = _FALSE;
 	adapter_wdev_data(padapter)->idle_mode = _FALSE;
 	adapter_wdev_data(padapter)->block_scan = _FALSE;
+	adapter_wdev_data(padapter)->suspending = _FALSE;
 
 	/* Recovery Receive Multicast */
 	rtw_write32(padapter, REG_RCR, rtw_read32(padapter, REG_RCR) | (RCR_AM));

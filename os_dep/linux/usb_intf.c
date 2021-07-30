@@ -1089,6 +1089,7 @@ static int rtw_resume(struct usb_interface *pusb_intf)
 
 		if (sec_adapter && (sec_adapter->bup == _FALSE))
 			netdev_open(sec_adapter->pnetdev);
+		adapter_wdev_data(sec_adapter)->suspending = _FALSE;
 	}
 #endif
 
