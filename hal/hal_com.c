@@ -2692,6 +2692,89 @@ bool rtw_sec_read_cam_is_gk(_adapter *adapter, u8 id)
 	res = (ctrl & BIT6) ? _TRUE : _FALSE;
 	return res;
 }
+
+u8 rtw_sec_search_camid(_adapter *adapter, u8 key_id, u8 is_gtk)
+{
+	struct dvobj_priv *dvobj = adapter_to_dvobj(adapter);
+	struct cam_ctl_t *cam_ctl = &dvobj->cam_ctl;
+	struct security_priv *psecuritypriv = &adapter->securitypriv;
+	u8 enc_alg;
+	u32 data;
+	u16 ctrl;
+	u16 ctrl_ext;
+	u8 addr;
+	u8 entry = cam_ctl->num;
+	u8 i;
+
+	if ((key_id > 0 && is_gtk == 0) || key_id < 0)
+		goto exit;
+
+	if (key_id == 0 && is_gtk == 0)
+		enc_alg = psecuritypriv->dot11PrivacyAlgrthm;
+	else if (key_id < 4)
+		enc_alg = psecuritypriv->dot118021XGrpPrivacy;
+#ifdef CONFIG_IEEE80211W
+	else if (key_id < 5)
+		enc_alg = _BIP_CMAC_128_;
+#endif
+	else
+		goto exit;
+
+	switch (enc_alg) {
+	case _AES_:
+		ctrl |= (key_id & CAM_KEY_ID_BIT_MASK) |
+			((enc_alg & CAM_SEC_TYPE_BIT_MASK) << CAM_KEY_ID_BIT_LEN) |
+			/* CAM_GROUP_KEY | */
+			CAM_VALID;
+		break;
+	case _TKIP_:
+		ctrl = (enc_alg << CAM_KEY_ID_BIT_LEN) |
+			/* CAM_GROUP_KEY | */
+			CAM_VALID;
+		break;
+#ifdef CONFIG_IEEE80211W
+	case _BIP_CMAC_128_:
+		ctrl = (key_id & CAM_KEY_ID_BIT_MASK) |
+			((enc_alg & CAM_SEC_TYPE_BIT_MASK) << CAM_KEY_ID_BIT_LEN) |
+			/* CAM_GROUP_KEY | */
+			CAM_MGNT_KEY |
+			CAM_VALID;
+		break;
+#endif
+	default:
+		goto exit;
+	}
+
+	if (is_gtk)
+		ctrl |= CAM_GROUP_KEY;
+
+	for (i = 0; i < cam_ctl->num; i++) {
+		/* Each entry has 8*32 bytes */
+		addr = i * 8;
+		data = rtw_sec_read_cam(adapter, addr);
+
+		/* Search for a matching cam entry by ctrl field */
+		if(!_rtw_memcmp((void *)&ctrl, (void *)&data, CAM_CTRL_SIZE)) {
+			if (ctrl & CAM_EXT_SEC_KEY) {
+				if (i == cam_ctl->num - 1)
+					goto exit;
+
+				addr = (i + 1) * 8;
+				data = rtw_sec_read_cam(adapter, addr);
+
+				ctrl_ext = ctrl | CAM_MIC_KEY;
+				if(_rtw_memcmp((void *)&(ctrl_ext), (void *)&data, CAM_CTRL_SIZE))
+					goto exit;
+			}
+			entry = i;
+			break;
+		}
+	}
+
+exit:
+	return entry;
+}
+
 #ifdef CONFIG_MBSSID_CAM
 void rtw_mbid_cam_init(struct dvobj_priv *dvobj)
 {
@@ -5015,6 +5098,17 @@ void rtw_hal_set_FwAoacRsvdPage_cmd(PADAPTER padapter, PRSVDPAGE_LOC rsvdpageloc
 		_rtw_memset(&u1H2CAoacRsvdPageParm, 0, sizeof(u1H2CAoacRsvdPageParm));
 		SET_H2CCMD_AOAC_RSVDPAGE_LOC_AOAC_REPORT(u1H2CAoacRsvdPageParm,
 					 rsvdpageloc->LocAOACReport);
+#ifdef CONFIG_IEEE80211W
+		RTW_INFO("IEEE80211w Info=%d\n", rsvdpageloc->LocIeee80211w_Info);
+		SET_H2CCMD_AOAC_RSVDPAGE_LOC_IEEE80211W_INFO(u1H2CAoacRsvdPageParm, rsvdpageloc->LocIeee80211w_Info);
+		RTW_INFO("SA Query=%d\n", rsvdpageloc->LocSaQuery);
+		SET_H2CCMD_AOAC_RSVDPAGE_LOC_SA_QUERY(u1H2CAoacRsvdPageParm, rsvdpageloc->LocSaQuery);
+#endif
+#ifdef CONFIG_GTK_OL
+		RTW_INFO("GTKInfoV2=%d\n", rsvdpageloc->LocGTKInfoV2);
+		SET_H2CCMD_AOAC_RSVDPAGE_LOC_GTKINFO_V2(u1H2CAoacRsvdPageParm, rsvdpageloc->LocGTKInfoV2);
+#endif
+
 		ret = rtw_hal_fill_h2c_cmd(padapter,
 				   H2C_AOAC_RSVDPAGE3,
 				   H2C_AOAC_RSVDPAGE_LOC_LEN,
@@ -5496,6 +5590,7 @@ static void rtw_hal_update_gtk_offload_info(_adapter *adapter)
 	_irqL irqL;
 	u8 get_key[16];
 	u8 gtk_id = 0, offset = 0, i = 0, sz = 0, aoac_rpt_ver = 0, has_rekey = _FALSE;
+	u8 cam_id;
 	u64 replay_count = 0, tmp_iv_hdr = 0, pkt_pn = 0;
 
 	if (!MLME_IS_STA(adapter))
@@ -5532,12 +5627,26 @@ static void rtw_hal_update_gtk_offload_info(_adapter *adapter)
 		RTW_INFO("%s no rekey event happened.\n", __func__);
 	} else if (has_rekey == _TRUE) {
 		RTW_INFO("%s update security key.\n", __func__);
-		/*read key from sec-cam,for DK ,keyindex is equal to cam-id*/
-		rtw_sec_read_cam_ent(adapter, gtk_id,
-				     NULL, NULL, get_key);
-		rtw_clean_hw_dk_cam(adapter);
 
-		if (_rtw_camid_is_gk(adapter, gtk_id)) {
+#ifdef CONFIG_IEEE80211W
+		if (psecuritypriv->binstallBIPkey) {
+			_rtw_memcpy((void *)get_key, (void *)paoac_rpt->group_key, 16);
+
+			cam_id = rtw_sec_search_camid(adapter, gtk_id, 1);
+			if (cam_id == cam_ctl->num)
+				RTW_WARN("%s search camid failed!\n", __func__);
+		} else
+#endif
+		{
+			/*read key from sec-cam,for DK ,keyindex is equal to cam-id*/
+			rtw_sec_read_cam_ent(adapter, gtk_id,
+					     NULL, NULL, get_key);
+			rtw_clean_hw_dk_cam(adapter);
+
+			cam_id = gtk_id;
+		}
+
+		if (_rtw_camid_is_gk(adapter, cam_id)) {
 			_enter_critical_bh(&cam_ctl->lock, &irqL);
 			_rtw_memcpy(&dvobj->cam_cache[gtk_id].key,
 				    get_key, 16);
@@ -5545,10 +5654,22 @@ static void rtw_hal_update_gtk_offload_info(_adapter *adapter)
 		} else {
 			struct setkey_parm parm_gtk;
 
-			parm_gtk.algorithm = paoac_rpt->security_type;
+			parm_gtk.algorithm = psecuritypriv->dot118021XGrpPrivacy;
 			parm_gtk.keyid = gtk_id;
 			_rtw_memcpy(parm_gtk.key, get_key, 16);
 			setkey_hdl(adapter, (u8 *)&parm_gtk);
+		}
+
+#ifdef CONFIG_IEEE80211W
+		if (psecuritypriv->binstallBIPkey) {
+			psecuritypriv->dot11wBIPKeyid = paoac_rpt->igtk_keyid[0];
+			_rtw_memcpy((void *)psecuritypriv->dot11wBIPKey[4].skey, (void *)paoac_rpt->igtk[0], 16);
+			_rtw_memcpy((void *)psecuritypriv->dot11wBIPKey[5].skey, (void *)paoac_rpt->igtk[1], 16);
+		} else
+#endif
+		{
+			rtw_clean_dk_section(adapter);
+			rtw_write8(adapter, REG_SECCFG, 0x0c);
 		}
 
 		/*update key into related sw variable and sec-cam cache*/
@@ -5584,9 +5705,17 @@ static void rtw_hal_update_gtk_offload_info(_adapter *adapter)
 		}
 	}
 
-	rtw_clean_dk_section(adapter);
+#ifdef CONFIG_IEEE80211W
+	/* Update IGTK RX IPN */
+	if (psecuritypriv->binstallBIPkey) {
+		_rtw_memcpy((void *)&psecuritypriv->dot11wBIPrxpn.val, (void *)paoac_rpt->igtk_pkt_num, 6);
+	} else
+#endif
+	{
+		rtw_clean_dk_section(adapter);
 
-	rtw_write8(adapter, REG_SECCFG, 0x0c);
+		rtw_write8(adapter, REG_SECCFG, 0x0c);
+	}
 
 	#ifdef CONFIG_GTK_OL_DBG
 	/* if (gtk_keyindex != 5) */
@@ -5617,6 +5746,10 @@ static void rtw_dump_aoac_rpt(_adapter *adapter)
 	RTW_INFO_DUMP("[AOAC-RPT] RX GTK[1] IV-", paoac_rpt->rxgtk_iv[1], 8);
 	RTW_INFO_DUMP("[AOAC-RPT] RX GTK[2] IV-", paoac_rpt->rxgtk_iv[2], 8);
 	RTW_INFO_DUMP("[AOAC-RPT] RX GTK[3] IV-", paoac_rpt->rxgtk_iv[3], 8);
+	RTW_INFO_DUMP("[AOAC-RPT] IGTK KEY ID - ", paoac_rpt->igtk_keyid, 2);
+	RTW_INFO_DUMP("[AOAC-RPT] IGTK IPN - ", paoac_rpt->igtk_pkt_num, 6);
+	RTW_INFO_DUMP("[AOAC-RPT] IGTK[4] - ", paoac_rpt->igtk[0], 32);
+	RTW_INFO_DUMP("[AOAC-RPT] IGTK[5] - ", paoac_rpt->igtk[1], 32);
 }
 
 static void rtw_hal_get_aoac_rpt(_adapter *adapter)
@@ -5634,6 +5767,12 @@ static void rtw_hal_get_aoac_rpt(_adapter *adapter)
 	page_number = 1;
 
 	rtw_hal_get_def_var(adapter, HAL_DEF_TX_PAGE_SIZE, &page_size);
+
+	if (page_size >= PAGE_SIZE_256)
+		page_number = 1;
+	else
+		page_number = 2;
+
 	buf_size = page_size * page_number;
 
 	buffer = rtw_zvmalloc(buf_size);
@@ -5836,11 +5975,9 @@ static u8 rtw_hal_set_wowlan_ctrl_cmd(_adapter *adapter, u8 enable, u8 change_un
 #ifdef LGE_PRIVATE
 	if (adapter_wdev_data(adapter)->wowl == _FALSE) {
 		magic_pkt = 0;
-		discont_wake = 0;
-	} else
-		discont_wake = 0;
-
+	}
 #endif
+
 	RTW_INFO("%s(): enable=%d change_unit=%d\n", __func__,
 		 enable, change_unit);
 
@@ -6102,17 +6239,27 @@ static u8 rtw_hal_set_war_offload_parm(_adapter *adapter, PRSVDPAGE_LOC rsvdpage
 }
 #endif /* CONFIG_WAR_OFFLOAD */
 
-static u8 rtw_hal_set_global_info_cmd(_adapter *adapter, u8 group_alg, u8 pairwise_alg)
+static u8 rtw_hal_set_global_info_cmd(_adapter *adapter)
 {
+	struct security_priv *psecpriv = &adapter->securitypriv;
 	u8 ret = _FAIL;
 	u8 u1H2CAOACGlobalInfoParm[H2C_AOAC_GLOBAL_INFO_LEN] = {0};
 
 	RTW_INFO("%s(): group_alg=%d pairwise_alg=%d\n",
-		 __func__, group_alg, pairwise_alg);
+		 __func__, psecpriv->dot118021XGrpPrivacy, psecpriv->dot11PrivacyAlgrthm);
 	SET_H2CCMD_AOAC_GLOBAL_INFO_PAIRWISE_ENC_ALG(u1H2CAOACGlobalInfoParm,
-			pairwise_alg);
+			psecpriv->dot11PrivacyAlgrthm);
 	SET_H2CCMD_AOAC_GLOBAL_INFO_GROUP_ENC_ALG(u1H2CAOACGlobalInfoParm,
-			group_alg);
+			psecpriv->dot118021XGrpPrivacy);
+#ifdef CONFIG_IEEE80211W
+	RTW_INFO("%s(): group_11w_alg=0x%02x\n", __func__, psecpriv->dot11wCipher);
+	SET_H2CCMD_AOAC_GLOBAL_INFO_11W_GROUP_ENC_ALG(u1H2CAOACGlobalInfoParm,
+			psecpriv->dot11wCipher);
+#endif
+#ifdef CONFIG_GTK_OL
+	if (psecpriv->auth_alg == WLAN_AUTH_SAE)
+		SET_H2CCMD_AOAC_GLOBAL_INFO_IEEE_AKM_SUITE_TYPE(u1H2CAOACGlobalInfoParm, WLAN_AKM_SAE[3]);
+#endif
 
 	ret = rtw_hal_fill_h2c_cmd(adapter,
 				   H2C_AOAC_GLOBAL_INFO,
@@ -6171,9 +6318,7 @@ void rtw_hal_set_fw_wow_related_cmd(_adapter *padapter, u8 enable)
 
 	if (enable) {
 		if(!no_wake)
-			rtw_hal_set_global_info_cmd(padapter,
-					    psecpriv->dot118021XGrpPrivacy,
-					    psecpriv->dot11PrivacyAlgrthm);
+			rtw_hal_set_global_info_cmd(padapter);
 
 		if (!(ppwrpriv->wowlan_pno_enable)) {
 			if (pregistry->wakeup_event & BIT(2) && !no_wake)
@@ -9171,6 +9316,76 @@ static void rtw_hal_construct_remote_control_info(_adapter *adapter,
 	}
 }
 
+#ifdef CONFIG_IEEE80211W
+void rtw_hal_construct_sa_query(_adapter *padapter, u8* pframe, u32 *pLength, unsigned char *raddr)
+{
+	struct xmit_priv		*pxmitpriv = &(padapter->xmitpriv);
+	struct mlme_ext_priv		*pmlmeext = &(padapter->mlmeextpriv);
+	struct mlme_ext_info		*pmlmeinfo = &(pmlmeext->mlmext_info);
+	struct security_priv		*psecuritypriv = &padapter->securitypriv;
+	struct sta_info 		*psta;
+	struct rtw_ieee80211_hdr	*pwlanhdr;
+	u8	category = RTW_WLAN_CATEGORY_SA_QUERY;
+	u8	action = 0;
+	u8	tid = 0;
+	u8	EncryptionHeadOverhead;
+	u16	*fctrl;
+	u32	pktlen;
+
+	pwlanhdr = (struct rtw_ieee80211_hdr *)pframe;
+
+	fctrl = &(pwlanhdr->frame_ctl);
+	*(fctrl) = 0;
+
+	if (raddr)
+		_rtw_memcpy(pwlanhdr->addr1, raddr, ETH_ALEN);
+	else
+		_rtw_memcpy(pwlanhdr->addr1, get_my_bssid(&(pmlmeinfo->network)), ETH_ALEN);
+	_rtw_memcpy(pwlanhdr->addr2, adapter_mac_addr(padapter), ETH_ALEN);
+	_rtw_memcpy(pwlanhdr->addr3, get_my_bssid(&(pmlmeinfo->network)), ETH_ALEN);
+
+	SetSeqNum(pwlanhdr, pmlmeext->mgnt_seq);
+	pmlmeext->mgnt_seq++;
+	set_frame_sub_type(pframe, WIFI_ACTION);
+
+	pframe += sizeof(struct rtw_ieee80211_hdr_3addr);
+	pktlen = sizeof(struct rtw_ieee80211_hdr_3addr);
+
+	switch (psecuritypriv->dot11PrivacyAlgrthm) {
+	case _WEP40_:
+	case _WEP104_:
+		EncryptionHeadOverhead = 4;
+		break;
+	case _TKIP_:
+		EncryptionHeadOverhead = 8;
+		break;
+	case _AES_:
+		EncryptionHeadOverhead = 8;
+		break;
+#ifdef CONFIG_WAPI_SUPPORT
+	case _SMS4_:
+		EncryptionHeadOverhead = 18;
+		break;
+#endif
+	default:
+		EncryptionHeadOverhead = 0;
+	}
+
+	if (EncryptionHeadOverhead > 0) {
+		_rtw_memset(&(pframe[pktlen]), 0, EncryptionHeadOverhead);
+		pktlen += EncryptionHeadOverhead;
+		/* SET_80211_HDR_WEP(pARPRspPkt, 1);  */ /* Suggested by CCW. */
+		SetPrivacy(fctrl);
+	}
+	pframe = pframe + EncryptionHeadOverhead;
+	pframe = rtw_set_fixed_ie(pframe, 1, &category, &pktlen);
+	pframe = rtw_set_fixed_ie(pframe, 1, &action, &pktlen);
+	pframe = rtw_set_fixed_ie(pframe, 2, &tid, &pktlen);
+
+	*pLength = pktlen;
+}
+#endif /* CONFIG_IEEE80211W */
+
 void rtw_hal_set_wow_fw_rsvd_page(_adapter *adapter, u8 *pframe, u16 index,
 		  u8 tx_desc, u32 page_size, u8 *page_num, u32 *total_pkt_len,
 				  RSVDPAGE_LOC *rsvd_page_loc)
@@ -9192,11 +9407,18 @@ void rtw_hal_set_wow_fw_rsvd_page(_adapter *adapter, u8 *pframe, u16 index,
 	struct security_priv *psecpriv = &adapter->securitypriv;
 	u8 kek[RTW_KEK_LEN];
 	u8 kck[RTW_KCK_LEN];
+	u8 gtk_info_v2_ver = 0x01;
+	u32 GTKInfoV2Length = 0;
 #endif /* CONFIG_GTK_OL */
 #ifdef CONFIG_PNO_SUPPORT
 	int pno_index;
 	u8 ssid_num;
 #endif /* CONFIG_PNO_SUPPORT */
+#ifdef CONFIG_IEEE80211W
+	u8 ieee80211w_info_ver = 0x01;
+	u32 Ieee80211wInfoLength = 0;
+	u32 sa_query_req_len = 0;
+#endif
 
 	pmlmeext = &adapter->mlmeextpriv;
 	pmlmeinfo = &pmlmeext->mlmext_info;
@@ -9289,58 +9511,78 @@ void rtw_hal_set_wow_fw_rsvd_page(_adapter *adapter, u8 *pframe, u16 index,
 		}
 
 		/* 3 KEK, KCK */
-		rsvd_page_loc->LocGTKInfo = *page_num;
-		RTW_INFO("LocGTKInfo: %d\n", rsvd_page_loc->LocGTKInfo);
+		if (psecuritypriv->auth_alg != WLAN_AUTH_SAE) {
+			rsvd_page_loc->LocGTKInfo = *page_num;
+			RTW_INFO("LocGTKInfo: %d\n", rsvd_page_loc->LocGTKInfo);
 
-		if (IS_HARDWARE_TYPE_8188E(adapter) || IS_HARDWARE_TYPE_8812(adapter)) {
-			struct security_priv *psecpriv = NULL;
+			if (IS_HARDWARE_TYPE_8188E(adapter) || IS_HARDWARE_TYPE_8812(adapter)) {
+				struct security_priv *psecpriv = NULL;
 
-			psecpriv = &adapter->securitypriv;
-			_rtw_memcpy(pframe + index - tx_desc,
-				    &psecpriv->dot11PrivacyAlgrthm, 1);
-			_rtw_memcpy(pframe + index - tx_desc + 1,
-				    &psecpriv->dot118021XGrpPrivacy, 1);
-			_rtw_memcpy(pframe + index - tx_desc + 2,
-				    kck, RTW_KCK_LEN);
-			_rtw_memcpy(pframe + index - tx_desc + 2 + RTW_KCK_LEN,
-				    kek, RTW_KEK_LEN);
-			CurtPktPageNum = (u8)PageNum(tx_desc + 2 + RTW_KCK_LEN + RTW_KEK_LEN, page_size);
-		} else {
+				psecpriv = &adapter->securitypriv;
+				_rtw_memcpy(pframe + index - tx_desc,
+					    &psecpriv->dot11PrivacyAlgrthm, 1);
+				_rtw_memcpy(pframe + index - tx_desc + 1,
+					    &psecpriv->dot118021XGrpPrivacy, 1);
+				_rtw_memcpy(pframe + index - tx_desc + 2,
+					    kck, RTW_KCK_LEN);
+				_rtw_memcpy(pframe + index - tx_desc + 2 + RTW_KCK_LEN,
+					    kek, RTW_KEK_LEN);
+				CurtPktPageNum = (u8)PageNum(tx_desc + 2 + RTW_KCK_LEN + RTW_KEK_LEN, page_size);
+			} else {
 
-			_rtw_memcpy(pframe + index - tx_desc, kck, RTW_KCK_LEN);
-			_rtw_memcpy(pframe + index - tx_desc + RTW_KCK_LEN,
-				    kek, RTW_KEK_LEN);
-			GTKLength = tx_desc + RTW_KCK_LEN + RTW_KEK_LEN;
+				_rtw_memcpy(pframe + index - tx_desc, kck, RTW_KCK_LEN);
+				_rtw_memcpy(pframe + index - tx_desc + RTW_KCK_LEN,
+					    kek, RTW_KEK_LEN);
+				GTKLength = tx_desc + RTW_KCK_LEN + RTW_KEK_LEN;
 
-			if (psta != NULL &&
-				psecuritypriv->dot118021XGrpPrivacy == _TKIP_) {
-				_rtw_memcpy(pframe + index - tx_desc + 56,
-					&psta->dot11tkiptxmickey, RTW_TKIP_MIC_LEN);
-				GTKLength += RTW_TKIP_MIC_LEN;
+				if (psta != NULL &&
+					psecuritypriv->dot118021XGrpPrivacy == _TKIP_) {
+					_rtw_memcpy(pframe + index - tx_desc + 56,
+						&psta->dot11tkiptxmickey, RTW_TKIP_MIC_LEN);
+					GTKLength += RTW_TKIP_MIC_LEN;
+				}
+				CurtPktPageNum = (u8)PageNum(GTKLength, page_size);
 			}
-			CurtPktPageNum = (u8)PageNum(GTKLength, page_size);
-		}
 #if 0
-		{
-			int i;
-			printk("\ntoFW KCK: ");
-			for (i = 0; i < 16; i++)
-				printk(" %02x ", kck[i]);
-			printk("\ntoFW KEK: ");
-			for (i = 0; i < 16; i++)
-				printk(" %02x ", kek[i]);
-			printk("\n");
-		}
+			{
+				int i;
+				printk("\ntoFW KCK: ");
+				for (i = 0; i < 16; i++)
+					printk(" %02x ", kck[i]);
+				printk("\ntoFW KEK: ");
+				for (i = 0; i < 16; i++)
+					printk(" %02x ", kek[i]);
+				printk("\n");
+			}
 
-		RTW_INFO("%s(): HW_VAR_SET_TX_CMD: KEK KCK %p %d\n",
-			 __FUNCTION__, &pframe[index - tx_desc],
-			 (tx_desc + RTW_KCK_LEN + RTW_KEK_LEN));
+			RTW_INFO("%s(): HW_VAR_SET_TX_CMD: KEK KCK %p %d\n",
+				 __FUNCTION__, &pframe[index - tx_desc],
+				 (tx_desc + RTW_KCK_LEN + RTW_KEK_LEN));
 #endif
 
-		*page_num += CurtPktPageNum;
+			*page_num += CurtPktPageNum;
 
-		index += (CurtPktPageNum * page_size);
-		RSVD_PAGE_CFG("WOW-GTKInfo", CurtPktPageNum, *page_num, 0);
+			index += (CurtPktPageNum * page_size);
+			RSVD_PAGE_CFG("WOW-GTKInfo", CurtPktPageNum, *page_num, 0);
+		} else {
+			rsvd_page_loc->LocGTKInfoV2 = *page_num;
+			RTW_INFO("LocGTKInfoV2: %d\n", rsvd_page_loc->LocGTKInfoV2);
+
+			_rtw_memcpy(pframe + index - tx_desc, &gtk_info_v2_ver, 1);
+
+			pframe[index - tx_desc + 8] = RTW_KCK_LEN;
+			_rtw_memcpy(pframe + index - tx_desc + 8 + 1, kck, RTW_KCK_LEN);
+
+			pframe[index - tx_desc + 8 + 1 + RTW_KCK_LEN] = RTW_KEK_LEN;
+			_rtw_memcpy(pframe + index - tx_desc + 8 + 2 + RTW_KCK_LEN, kek, RTW_KEK_LEN);
+
+			GTKInfoV2Length = 8 + 2 + RTW_KCK_LEN + RTW_KEK_LEN;
+
+			CurtPktPageNum = (u8)PageNum(GTKInfoV2Length, page_size);
+			*page_num += CurtPktPageNum;
+			index += (CurtPktPageNum * page_size);
+			RSVD_PAGE_CFG("WOW-LocGTKInfoV2", CurtPktPageNum, *page_num, GTKInfoV2Length);
+		}
 
 		/* 3 GTK Response */
 		rsvd_page_loc->LocGTKRsp = *page_num;
@@ -9389,6 +9631,47 @@ void rtw_hal_set_wow_fw_rsvd_page(_adapter *adapter, u8 *pframe, u16 index,
 #endif /* CONFIG_GTK_OL */
 
 		index += (CurtPktPageNum * page_size);
+
+#ifdef CONFIG_IEEE80211W
+		if (psecpriv->binstallBIPkey) {
+			rsvd_page_loc->LocIeee80211w_Info = *page_num;
+			RTW_INFO("LocIeee80211w_Info: %d\n", rsvd_page_loc->LocIeee80211w_Info);
+#if 0
+			printk("FW using BIP Key id: 0x%x\n",psecpriv->dot11wBIPKeyid);
+			{
+				int i;
+				printk("FW IPN:");
+				printk(" %llx\n", psecpriv->dot11wBIPrxpn.val);
+				printk("FW IGTK:\n");
+				for (i = 0; i < 32; i++)
+					printk(" %02x,", psecpriv->dot11wBIPKey[psecpriv->dot11wBIPKeyid].skey[i]);
+				printk("\n");
+			}
+#endif
+			_rtw_memcpy(pframe + index - tx_desc, &ieee80211w_info_ver, 1);
+			_rtw_memcpy(pframe + index - tx_desc + 8, &psecpriv->dot11wBIPKeyid, 2);
+			_rtw_memcpy(pframe + index - tx_desc + 8 + 2, &psecpriv->dot11wBIPrxpn.val, 6);
+			_rtw_memcpy(pframe + index - tx_desc + 8 + 2 + 6 + 8, psecpriv->dot11wBIPKey[4].skey, 32);
+			_rtw_memcpy(pframe + index - tx_desc + 8 + 2 + 6 + 8 + 32, psecpriv->dot11wBIPKey[5].skey, 32);
+			Ieee80211wInfoLength = 8 + 2 + 6 + 8 + 32 + 32;
+
+			CurtPktPageNum = (u8)PageNum(Ieee80211wInfoLength, page_size);
+			*page_num += CurtPktPageNum;
+			index += (CurtPktPageNum * page_size);
+			RSVD_PAGE_CFG("WOW-LocIeee80211w_Info", CurtPktPageNum, *page_num, Ieee80211wInfoLength);
+
+			rsvd_page_loc->LocSaQuery = *page_num;
+			RTW_INFO("LocSaQuery: %d\n", rsvd_page_loc->LocSaQuery);
+			rtw_hal_construct_sa_query(adapter, &pframe[index], &sa_query_req_len, 0);
+			rtw_hal_fill_fake_txdesc(adapter,
+						&pframe[index - tx_desc],
+						sa_query_req_len, _FALSE, _FALSE, _TRUE);
+			CurtPktPageNum = (u8)PageNum(tx_desc + sa_query_req_len, page_size);
+			*page_num += CurtPktPageNum;
+			index += (CurtPktPageNum * page_size);
+			RSVD_PAGE_CFG("WOW-SaQueryReq", CurtPktPageNum, *page_num, sa_query_req_len);
+		}
+#endif
 
 #ifdef CONFIG_WAR_OFFLOAD
 				if(_TRUE == pwrctl->wowlan_war_offload_mode) {
@@ -9655,11 +9938,17 @@ void rtw_hal_set_wow_fw_rsvd_page(_adapter *adapter, u8 *pframe, u16 index,
 #endif /* CONFIG_WAR_OFFLOAD */
 
 
-		/*Reserve 1 page for AOAC report*/
+		/*Reserve 1~2 page for AOAC report*/
 		rsvd_page_loc->LocAOACReport = *page_num;
 		RTW_INFO("LocAOACReport: %d\n", rsvd_page_loc->LocAOACReport);
-		*page_num += 1;
-		*total_pkt_len = index + (page_size * 1);
+
+		if (page_size >= PAGE_SIZE_256)
+			CurtPktPageNum = 1;
+		else
+			CurtPktPageNum = 2;
+
+		*page_num += CurtPktPageNum;
+		*total_pkt_len = index + (page_size * CurtPktPageNum);
 		RSVD_PAGE_CFG("WOW-AOAC", 1, *page_num, *total_pkt_len);
 	} else {
 #ifdef CONFIG_PNO_SUPPORT
@@ -10763,7 +11052,11 @@ static void rtw_hal_wow_enable(_adapter *adapter)
 	}
 #endif
 #ifdef CONFIG_GTK_OL
-	if (psecuritypriv->binstallKCK_KEK == _TRUE)
+	if (psecuritypriv->binstallKCK_KEK == _TRUE
+#ifdef CONFIG_IEEE80211W
+	    && psecuritypriv->binstallBIPkey == _FALSE
+#endif
+	)
 		rtw_hal_fw_sync_cam_id(adapter);
 #endif
 	if (IS_HARDWARE_TYPE_8723B(adapter))

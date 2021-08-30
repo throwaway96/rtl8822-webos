@@ -23,7 +23,7 @@
 extern u8 array_mp_8822c_fw_nic[199264];
 extern u32 array_length_mp_8822c_fw_nic;
 #ifdef CONFIG_WOWLAN
-extern u8 array_mp_8822c_fw_wowlan[145080];
+extern u8 array_mp_8822c_fw_wowlan[163312];
 extern u32 array_length_mp_8822c_fw_wowlan;
 #endif /*CONFIG_WOWLAN*/
 #endif

@@ -90,7 +90,6 @@ CONFIG_RTW_IOT_CCK_PD_INIT = n
 CONFIG_RTW_DISABLE_HW_PDN = n
 # user priority mapping rule : tos, dscp
 CONFIG_RTW_UP_MAPPING_RULE = tos
-
 ########################## Android ###########################
 # CONFIG_RTW_ANDROID - 0: no Android, 4/5/6/7/8/9/10 : Android version
 CONFIG_RTW_ANDROID = 0
@@ -111,7 +110,7 @@ CONFIG_PROC_DEBUG = y
 ######################## Wake On Lan ##########################
 CONFIG_WOWLAN = y
 #bit2: deauth, bit1: unicast, bit0: magic pkt.
-CONFIG_WAKEUP_TYPE = 0x7
+CONFIG_WAKEUP_TYPE = 0x1
 CONFIG_WOW_LPS_MODE = default
 #bit0: disBBRF off, #bit1: Wireless remote controller (WRC)
 CONFIG_SUSPEND_TYPE = 0x0
