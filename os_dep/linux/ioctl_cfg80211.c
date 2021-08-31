@@ -8004,19 +8004,6 @@ static int cfg80211_rtw_mgmt_tx(struct wiphy *wiphy,
 		goto exit;
 	}
 
-#ifdef LGE_PRIVATE
-	if (MLME_IS_AP(padapter)) {
-		if (rtw_is_scan_deny(padapter)) {
-			ret = -EINVAL;
-			goto exit;
-		}
-		if (rtw_mi_buddy_check_fwstate(padapter, WIFI_UNDER_SURVEY | WIFI_UNDER_LINKING)) {
-			ret = -EINVAL;
-			goto exit;
-		}
-	}
-#endif
-
 	rfctl = adapter_to_rfctl(padapter);
 	tx_ch = (u8)ieee80211_frequency_to_channel(chan->center_freq);
 	if (IS_CH_WAITING(rfctl)) {
@@ -8058,6 +8045,16 @@ static int cfg80211_rtw_mgmt_tx(struct wiphy *wiphy,
 	rtw_cfg80211_mgmt_tx_status(wdev, *cookie, buf, len, ack, GFP_KERNEL);
 #elif (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 34) && LINUX_VERSION_CODE <= KERNEL_VERSION(2, 6, 36))
 	cfg80211_action_tx_status(ndev, *cookie, buf, len, ack, GFP_KERNEL);
+#endif
+
+#ifdef LGE_PRIVATE
+	if (MLME_IS_AP(padapter)) {
+		if ((rtw_is_scan_deny(padapter)) ||
+			(rtw_mi_buddy_check_fwstate(padapter,
+					WIFI_UNDER_SURVEY | WIFI_UNDER_LINKING))) {
+			goto exit;
+		}
+	}
 #endif
 
 	frame_styp = le16_to_cpu(((struct rtw_ieee80211_hdr_3addr *)buf)->frame_ctl) & IEEE80211_FCTL_STYPE;
